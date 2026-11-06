@@ -17,7 +17,7 @@ README.md
 .env.local
 .gitignore
 .idea
-.package-lock.json
+package-lock.json
 
 # Ignore lockfiles
 *.lock
