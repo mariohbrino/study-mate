@@ -1,9 +1,12 @@
 # Folders to ignore
+.github/skills
+.specify
 .vscode
-/node_modules
-/dist
 /build
 /coverage
+/dist
+/node_modules
+/specs
 
 # Files to ignore
 LICENSE
