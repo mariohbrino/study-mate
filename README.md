@@ -4,7 +4,7 @@ A study companion application to help you manage and organize your study session
 
 ## Prerequisites
 
-- Node.js (version 26.8.1 or later)
+- Node.js (version 20.9 or later)
 - npm
 
 ## Set up
