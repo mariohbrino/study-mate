@@ -11,7 +11,9 @@
     "lint": "eslint",
     "lint:fix": "eslint . --fix",
     "pretypecheck": "next typegen",
-    "typecheck": "tsc --noEmit --incremental false"
+    "typecheck": "tsc --noEmit --incremental false",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "drizzle-orm": "^1.0.0-rc.5",

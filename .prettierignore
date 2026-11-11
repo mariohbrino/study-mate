@@ -26,3 +26,6 @@ package-lock.json
 *.lock
 *.log
 yarn.lock
+
+# Ignore Custom Folders
+/drizzle
