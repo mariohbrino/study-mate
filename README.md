@@ -2,6 +2,13 @@
 
 A study companion application to help you manage and organize your study sessions effectively.
 
+## Team Members
+
+- Mario Brino (@mariohbrino)
+- Joseph Budu Larbi (@budujoseph)
+- Armando Martin Fernandez Jara (@Charmando000)
+- Israel Essien (@israelessien48-art)
+
 ## Prerequisites
 
 - Node.js (version 20.9 or later)
