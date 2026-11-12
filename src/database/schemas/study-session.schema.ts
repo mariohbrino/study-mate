@@ -11,7 +11,7 @@ import {
 import { assignments } from "@/database/schemas/assignments.schema";
 import { students } from "@/database/schemas/students.schema";
 
-export const sessions = pgTable(
+export const studySessions = pgTable(
   "study_sessions",
   {
     id: uuid("id")
