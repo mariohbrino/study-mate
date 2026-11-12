@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  index,
   pgTable,
   timestamp,
   uniqueIndex,
@@ -20,6 +19,6 @@ export const users = pgTable(
   },
   (table) => [
     uniqueIndex("users_email_key").on(table.email),
-    index("users_email_idx").on(table.email),
+    uniqueIndex("users_clerk_id_key").on(table.clerk_id),
   ],
 );

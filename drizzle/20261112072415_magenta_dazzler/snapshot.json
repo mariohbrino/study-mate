@@ -2,7 +2,7 @@
   "type": "base",
   "version": "9",
   "dialect": "postgres",
-  "id": "e15f9d1e-a535-4948-8c51-d6a3ecc89c5c",
+  "id": "6cae7ae4-fee9-4a2b-86a4-4ce401ce47fb",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -52,18 +52,18 @@
         "index",
         "public",
         "users",
-        "users_email_idx"
+        "users_clerk_id_key"
       ],
       "writes": [
-        "s|idx|public.users_email_idx",
-        "n|idx|public.users_email_idx",
-        "e|idx|public.users_email_idx",
-        "n|rel|public.users_email_idx"
+        "s|idx|public.users_clerk_id_key",
+        "n|idx|public.users_clerk_id_key",
+        "e|idx|public.users_clerk_id_key",
+        "n|rel|public.users_clerk_id_key"
       ],
       "reads": [
         "n|tbl|public.users",
         "n|sch|public",
-        "n|col|public.users.email"
+        "n|col|public.users.clerk_id"
       ]
     }
   ],
@@ -150,18 +150,18 @@
     {
       "schema": "public",
       "table": "users",
-      "name": "users_email_idx",
+      "name": "users_clerk_id_key",
       "nameExplicit": true,
       "columns": [
         {
-          "value": "email",
+          "value": "clerk_id",
           "isExpression": false,
           "asc": true,
           "nullsFirst": false,
           "opclass": null
         }
       ],
-      "isUnique": false,
+      "isUnique": true,
       "where": null,
       "with": "",
       "method": "btree",

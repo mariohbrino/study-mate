@@ -6,4 +6,4 @@ CREATE TABLE "users" (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX "users_email_key" ON "users" ("email");--> statement-breakpoint
-CREATE INDEX "users_email_idx" ON "users" ("email");
+CREATE UNIQUE INDEX "users_clerk_id_key" ON "users" ("clerk_id");
