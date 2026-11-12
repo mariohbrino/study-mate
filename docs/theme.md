@@ -24,20 +24,20 @@ Inter will be used for headings, paragraphs, navigation, buttons, and other inte
 
 The light theme uses a near-white background, dark text, and violet accents.
 
-| Variable | Purpose |
-|---|---|
-| `--background` | Main page background |
-| `--foreground` | Main text color |
-| `--card` | Cards and content sections |
-| `--primary` | Main buttons and important actions |
-| `--secondary` | Secondary interface elements |
-| `--muted` | Subtle backgrounds |
-| `--muted-foreground` | Supporting text |
-| `--accent` | Highlighted elements |
-| `--border` | Borders and separators |
-| `--input` | Form input borders |
-| `--ring` | Focus indicators |
-| `--destructive` | Error or destructive actions |
+| Variable             | Purpose                            |
+| -------------------- | ---------------------------------- |
+| `--background`       | Main page background               |
+| `--foreground`       | Main text color                    |
+| `--card`             | Cards and content sections         |
+| `--primary`          | Main buttons and important actions |
+| `--secondary`        | Secondary interface elements       |
+| `--muted`            | Subtle backgrounds                 |
+| `--muted-foreground` | Supporting text                    |
+| `--accent`           | Highlighted elements               |
+| `--border`           | Borders and separators             |
+| `--input`            | Form input borders                 |
+| `--ring`             | Focus indicators                   |
+| `--destructive`      | Error or destructive actions       |
 
 ## 4. Dark Mode Colors
 
