@@ -36,3 +36,32 @@ npm run lint
 npm run format
 npm run typecheck
 ```
+
+## Docker
+
+Before proceeding, ensure that Docker is installed and running on your system. Install
+docker on your system, see the [official docs](https://www.docker.com/products/docker-desktop/),
+and then set up the local database using docker compose:
+
+```bash
+docker compose up -d
+```
+
+To stop and remove the local database container, run:
+
+```bash
+docker compose down
+```
+
+> [!NOTE]
+> To remove the volume use tag `-v` with the `docker compose down` command.
+> This will remove the associated volumes along with the container, ensuring a clean
+> state for the database.
+
+## Migrate
+
+To apply database migrations using the local database container, run:
+
+```bash
+npm run db:migrate
+```
