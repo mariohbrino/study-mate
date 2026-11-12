@@ -8,6 +8,7 @@ A study companion application to help you manage and organize your study session
 - Joseph Budu Larbi (@budujoseph)
 - Armando Martin Fernandez Jara (@Charmando000)
 - Israel Essien (@israelessien48-art)
+- Saleh Ntege (@salehish)
 
 ## Prerequisites
 
