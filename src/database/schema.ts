@@ -1,1 +1,1 @@
-export { users } from "@/database/schemas/users.schema";
+export { students } from "@/database/schemas/students.schema";
