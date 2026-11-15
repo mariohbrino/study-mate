@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { databaseClient } from "@tests/commons/database";
-import { hasTable } from "@tests/utils/exist-table";
+import { hasTable } from "@tests/utils/has-table";
 
 describe("database migrations integrity tests", () => {
   let client: Awaited<ReturnType<typeof databaseClient>>;
