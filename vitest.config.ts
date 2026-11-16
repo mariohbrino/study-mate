@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@tests": fileURLToPath(new URL("./tests", import.meta.url)),
     },
   },
   test: {
@@ -24,7 +25,7 @@ export default defineConfig({
           name: "dom",
           environment: "jsdom",
           include: ["tests/**/*.test.tsx"],
-          setupFiles: ["./tests/commons/setup.ts"],
+          setupFiles: ["./tests/setup/component.setup.ts"],
         },
       },
       {
@@ -33,6 +34,7 @@ export default defineConfig({
           name: "node",
           environment: "node",
           include: ["tests/**/*.test.ts"],
+          setupFiles: ["./tests/setup/database.setup.ts"],
         },
       },
     ],
