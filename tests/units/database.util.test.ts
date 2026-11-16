@@ -12,7 +12,7 @@ const createConfig = (sslMode: boolean): DatabaseConfig => ({
   isDevelopment: true,
 });
 
-describe("createSslOptions", () => {
+describe("create ssl options tests", () => {
   it("returns false when SSL mode is disabled", () => {
     const config = createConfig(false);
 

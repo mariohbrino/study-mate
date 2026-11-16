@@ -1,14 +1,15 @@
-import Navigation from "@/components/Navigation";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { usePathname } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import Navigation from "@/components/Navigation";
+
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
 }));
 
-describe("Navigation", () => {
+describe("navigation component", () => {
   beforeEach(() => {
     vi.mocked(usePathname).mockReturnValue("/");
   });
