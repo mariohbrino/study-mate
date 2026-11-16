@@ -1,4 +1,4 @@
-import { databaseClient } from "@tests/commons/database";
+import { databaseClient } from "@tests/utils/database.util";
 
 export const hasTable = async (
   client: Awaited<ReturnType<typeof databaseClient>>,
