@@ -20,11 +20,11 @@ The student model uses the existing `students` database table.
 
 The student model will provide the following operations:
 
-- **Create:** Add a new student record.
+- **Store:** Add a new student record.
 - **Find by ID:** Retrieve a student using their UUID.
 - **Find by Clerk ID:** Retrieve a student using their Clerk identifier.
 - **Update:** Update an existing student's information.
-- **Delete:** Remove a student record using their UUID.
+- **Remove:** Remove a student record using their UUID.
 
 ## 4. Database Integration
 
@@ -38,11 +38,11 @@ Vitest and PGlite will be used to test the student model.
 
 Tests will cover:
 
-- Creating a student.
+- Storing a student.
 - Finding a student by ID.
 - Finding a student by Clerk ID.
 - Updating a student's timezone.
-- Deleting a student.
+- Removing a student.
 - Handling records that do not exist.
 - Preventing duplicate Clerk identifiers.
 
@@ -50,4 +50,4 @@ Tests will cover:
 
 A student can have multiple assignments and study sessions. These records reference the student's UUID through their `studentId` fields.
 
-Deleting a student must respect the existing database foreign-key constraints.
+Removing a student must respect the existing database foreign-key constraints.

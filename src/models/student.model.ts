@@ -3,12 +3,12 @@ import { eq } from "drizzle-orm";
 import { students } from "@/database/schema";
 import type { Database } from "@/types/database.type";
 import type {
-  CreateStudentInput,
+  StoreStudentInput,
   UpdateStudentInput,
 } from "@/types/student.model";
 
 export const createStudentModel = (db: Database) => {
-  const create = async (data: CreateStudentInput) => {
+  const store = async (data: StoreStudentInput) => {
     const [student] = await db.insert(students).values(data).returning();
 
     return student;
@@ -45,7 +45,7 @@ export const createStudentModel = (db: Database) => {
     return student ?? null;
   };
 
-  const deleteStudent = async (id: string) => {
+  const remove = async (id: string) => {
     const [student] = await db
       .delete(students)
       .where(eq(students.id, id))
@@ -55,10 +55,10 @@ export const createStudentModel = (db: Database) => {
   };
 
   return {
-    create,
+    store,
     findById,
     findByClerkId,
     update,
-    delete: deleteStudent,
+    remove,
   };
 };

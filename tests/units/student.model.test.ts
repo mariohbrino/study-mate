@@ -21,7 +21,7 @@ describe("student model unit tests", () => {
   });
 
   it("should create a student", async () => {
-    const student = await studentModel.create({
+    const student = await studentModel.store({
       clerkId: "clerk-create-test",
       timezone: "Africa/Accra",
     });
@@ -36,7 +36,7 @@ describe("student model unit tests", () => {
   });
 
   it("should find a student by ID", async () => {
-    const created = await studentModel.create({
+    const created = await studentModel.store({
       clerkId: "clerk-find-id-test",
       timezone: "UTC",
     });
@@ -47,7 +47,7 @@ describe("student model unit tests", () => {
   });
 
   it("should find a student by Clerk ID", async () => {
-    await studentModel.create({
+    await studentModel.store({
       clerkId: "clerk-find-clerk-test",
       timezone: "UTC",
     });
@@ -64,7 +64,7 @@ describe("student model unit tests", () => {
   });
 
   it("should update a student's timezone", async () => {
-    const created = await studentModel.create({
+    const created = await studentModel.store({
       clerkId: "clerk-update-test",
       timezone: "UTC",
     });
@@ -77,12 +77,12 @@ describe("student model unit tests", () => {
   });
 
   it("should delete a student", async () => {
-    const created = await studentModel.create({
+    const created = await studentModel.store({
       clerkId: "clerk-delete-test",
       timezone: "UTC",
     });
 
-    const deleted = await studentModel.delete(created.id);
+    const deleted = await studentModel.remove(created.id);
     const result = await studentModel.findById(created.id);
 
     expect(deleted?.id).toBe(created.id);
