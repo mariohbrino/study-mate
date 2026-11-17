@@ -2,7 +2,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createStudentModel } from "@/models/student.model";
 import { database } from "@/services/database.service";
-import type { StoreStudentInput } from "@/types/student.model";
+import type { StoreStudentInput } from "@/types/student.type";
 
 describe("student model unit tests", () => {
   let client: ReturnType<typeof database>;

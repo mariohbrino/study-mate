@@ -5,7 +5,7 @@ import type { Database } from "@/types/database.type";
 import type {
   StoreStudentInput,
   UpdateStudentInput,
-} from "@/types/student.model";
+} from "@/types/student.type";
 
 export const createStudentModel = (db: Database) => {
   const get = async () => {
