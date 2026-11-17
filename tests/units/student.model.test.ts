@@ -2,6 +2,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createStudentModel } from "@/models/student.model";
 import { database } from "@/services/database.service";
+import type { StoreStudentInput } from "@/types/student.model";
 
 describe("student model unit tests", () => {
   let client: ReturnType<typeof database>;
@@ -18,6 +19,40 @@ describe("student model unit tests", () => {
 
   afterEach(async () => {
     await client.$client.query("ROLLBACK");
+  });
+
+  it("should retrieve a empty list of students", async () => {
+    const result = await studentModel.get();
+    expect(result).toEqual([]);
+  });
+
+  it("should retrieve a list of students", async () => {
+    const students: StoreStudentInput[] = [
+      {
+        clerkId: "clerk-list-test-1",
+        timezone: "UTC",
+      },
+      {
+        clerkId: "clerk-list-test-2",
+        timezone: "UTC",
+      },
+      {
+        clerkId: "clerk-list-test-3",
+        timezone: "UTC",
+      },
+    ];
+
+    for (const student of students) {
+      await studentModel.store(student);
+    }
+
+    const result = await studentModel.get();
+
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.length).toBe(students.length);
+    expect(result.map((r) => r.clerkId)).toEqual(
+      students.map((s) => s.clerkId),
+    );
   });
 
   it("should create a student", async () => {

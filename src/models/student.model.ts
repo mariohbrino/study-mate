@@ -8,6 +8,11 @@ import type {
 } from "@/types/student.model";
 
 export const createStudentModel = (db: Database) => {
+  const get = async () => {
+    const studentList = await db.select().from(students);
+    return studentList;
+  };
+
   const store = async (data: StoreStudentInput) => {
     const [student] = await db.insert(students).values(data).returning();
 
@@ -55,6 +60,7 @@ export const createStudentModel = (db: Database) => {
   };
 
   return {
+    get,
     store,
     findById,
     findByClerkId,

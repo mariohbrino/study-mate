@@ -20,6 +20,7 @@ The student model uses the existing `students` database table.
 
 The student model will provide the following operations:
 
+- **Get:** Retrieve a list of all students.
 - **Store:** Add a new student record.
 - **Find by ID:** Retrieve a student using their UUID.
 - **Find by Clerk ID:** Retrieve a student using their Clerk identifier.
@@ -38,6 +39,8 @@ Vitest and PGlite will be used to test the student model.
 
 Tests will cover:
 
+- Retrieving an empty list of students.
+- Retrieving a list of students.
 - Storing a student.
 - Finding a student by ID.
 - Finding a student by Clerk ID.
