@@ -5,6 +5,7 @@ import { database } from "@/services/database.service";
 import type { StoreStudentInput } from "@/types/student.type";
 
 describe("student model unit tests", () => {
+  const missingId = "00000000-0000-4000-8000-000000000000";
   let client: ReturnType<typeof database>;
   let studentModel: ReturnType<typeof createStudentModel>;
 
@@ -122,5 +123,33 @@ describe("student model unit tests", () => {
 
     expect(deleted?.id).toBe(created.id);
     expect(result).toBeNull();
+  });
+
+  it("should return null when finding a non-existing student by ID", async () => {
+    expect(await studentModel.findById(missingId)).toBeNull();
+  });
+
+  it("an non-existing student should return null when updating", async () => {
+    const data = { timezone: "Africa/Accra" };
+    const result = await studentModel.update(missingId, data);
+    expect(result).toBeNull();
+  });
+
+  it("an non-existing student should return null when deleting", async () => {
+    const result = await studentModel.remove(missingId);
+    expect(result).toBeNull();
+  });
+
+  it("should throw when the ID is not a valid UUID for findById", async () => {
+    await expect(studentModel.findById("non-valid-id")).rejects.toThrow();
+  });
+
+  it("should throw when the ID is not a valid UUID for update", async () => {
+    const data = { timezone: "UTC" };
+    await expect(studentModel.update("non-valid-id", data)).rejects.toThrow();
+  });
+
+  it("should throw when the ID is not a valid UUID for delete", async () => {
+    await expect(studentModel.remove("non-valid-id")).rejects.toThrow();
   });
 });
