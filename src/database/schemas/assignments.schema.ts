@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { students } from "@/database/schemas/students.schema";
+import type { AssignmentStatus } from "@/types/assignment.type";
 
 export const assignments = pgTable(
   "assignments",
@@ -22,7 +23,9 @@ export const assignments = pgTable(
     description: varchar("description", { length: 255 }).notNull(),
     course: varchar("course", { length: 255 }).notNull(),
     dueAt: timestamp("due_at", { mode: "date" }).notNull().defaultNow(),
-    status: varchar("status", { length: 255 }).notNull(),
+    status: varchar("status", { length: 255 })
+      .$type<AssignmentStatus>()
+      .notNull(),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
   },

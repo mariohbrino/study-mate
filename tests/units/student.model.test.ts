@@ -2,8 +2,10 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createStudentModel } from "@/models/student.model";
 import { database } from "@/services/database.service";
+import type { StoreStudentInput } from "@/types/student.type";
 
 describe("student model unit tests", () => {
+  const missingId = "00000000-0000-4000-8000-000000000000";
   let client: ReturnType<typeof database>;
   let studentModel: ReturnType<typeof createStudentModel>;
 
@@ -20,8 +22,42 @@ describe("student model unit tests", () => {
     await client.$client.query("ROLLBACK");
   });
 
+  it("should retrieve a empty list of students", async () => {
+    const result = await studentModel.get();
+    expect(result).toEqual([]);
+  });
+
+  it("should retrieve a list of students", async () => {
+    const students: StoreStudentInput[] = [
+      {
+        clerkId: "clerk-list-test-1",
+        timezone: "UTC",
+      },
+      {
+        clerkId: "clerk-list-test-2",
+        timezone: "UTC",
+      },
+      {
+        clerkId: "clerk-list-test-3",
+        timezone: "UTC",
+      },
+    ];
+
+    for (const student of students) {
+      await studentModel.store(student);
+    }
+
+    const result = await studentModel.get();
+
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.length).toBe(students.length);
+    expect(result.map((r) => r.clerkId)).toEqual(
+      students.map((s) => s.clerkId),
+    );
+  });
+
   it("should create a student", async () => {
-    const student = await studentModel.create({
+    const student = await studentModel.store({
       clerkId: "clerk-create-test",
       timezone: "Africa/Accra",
     });
@@ -36,7 +72,7 @@ describe("student model unit tests", () => {
   });
 
   it("should find a student by ID", async () => {
-    const created = await studentModel.create({
+    const created = await studentModel.store({
       clerkId: "clerk-find-id-test",
       timezone: "UTC",
     });
@@ -47,7 +83,7 @@ describe("student model unit tests", () => {
   });
 
   it("should find a student by Clerk ID", async () => {
-    await studentModel.create({
+    await studentModel.store({
       clerkId: "clerk-find-clerk-test",
       timezone: "UTC",
     });
@@ -64,7 +100,7 @@ describe("student model unit tests", () => {
   });
 
   it("should update a student's timezone", async () => {
-    const created = await studentModel.create({
+    const created = await studentModel.store({
       clerkId: "clerk-update-test",
       timezone: "UTC",
     });
@@ -77,15 +113,43 @@ describe("student model unit tests", () => {
   });
 
   it("should delete a student", async () => {
-    const created = await studentModel.create({
+    const created = await studentModel.store({
       clerkId: "clerk-delete-test",
       timezone: "UTC",
     });
 
-    const deleted = await studentModel.delete(created.id);
+    const deleted = await studentModel.remove(created.id);
     const result = await studentModel.findById(created.id);
 
     expect(deleted?.id).toBe(created.id);
     expect(result).toBeNull();
+  });
+
+  it("should return null when finding a non-existing student by ID", async () => {
+    expect(await studentModel.findById(missingId)).toBeNull();
+  });
+
+  it("an non-existing student should return null when updating", async () => {
+    const data = { timezone: "Africa/Accra" };
+    const result = await studentModel.update(missingId, data);
+    expect(result).toBeNull();
+  });
+
+  it("an non-existing student should return null when deleting", async () => {
+    const result = await studentModel.remove(missingId);
+    expect(result).toBeNull();
+  });
+
+  it("should throw when the ID is not a valid UUID for findById", async () => {
+    await expect(studentModel.findById("non-valid-id")).rejects.toThrow();
+  });
+
+  it("should throw when the ID is not a valid UUID for update", async () => {
+    const data = { timezone: "UTC" };
+    await expect(studentModel.update("non-valid-id", data)).rejects.toThrow();
+  });
+
+  it("should throw when the ID is not a valid UUID for delete", async () => {
+    await expect(studentModel.remove("non-valid-id")).rejects.toThrow();
   });
 });
