@@ -27,12 +27,12 @@ export const createAssignmentModel = (db: Database) => {
     },
 
     async findByStudentId(studentId: string) {
-      const [assignment] = await db
+      const assignment = await db
         .select()
         .from(tables.assignments)
         .where(eq(tables.assignments.studentId, studentId));
 
-      return assignment ? assignment : null;
+      return assignment;
     },
 
     async findById(id: string) {
