@@ -12,27 +12,7 @@ describe("assignment model unit tests", () => {
   let assignmentModel: ReturnType<typeof createAssignmentModel>;
   let studentModel: ReturnType<typeof createStudentModel>;
 
-  beforeAll(() => {
-    client = database();
-    assignmentModel = createAssignmentModel(client);
-    studentModel = createStudentModel(client);
-  });
-
-  beforeEach(async () => {
-    await client.$client.query("BEGIN");
-  });
-
-  afterEach(async () => {
-    await client.$client.query("ROLLBACK");
-  });
-
-  it("should retrieve an empty list of assignments initially", async () => {
-    const assignments = await assignmentModel.get();
-    expect(assignments).toBeDefined();
-    expect(assignments).toHaveLength(0);
-  });
-
-  it("should retrieve a list of assignments", async () => {
+  const createAssignments = async () => {
     const student = await studentModel.store({
       clerkId: "clerk-create-test",
       timezone: "Africa/Accra",
@@ -64,7 +44,31 @@ describe("assignment model unit tests", () => {
       course: "Course 1",
       dueAt: new Date(),
     });
+    return { student, assignment, assignment2, assignment3 };
+  };
 
+  beforeAll(() => {
+    client = database();
+    assignmentModel = createAssignmentModel(client);
+    studentModel = createStudentModel(client);
+  });
+
+  beforeEach(async () => {
+    await client.$client.query("BEGIN");
+  });
+
+  afterEach(async () => {
+    await client.$client.query("ROLLBACK");
+  });
+
+  it("should retrieve an empty list of assignments initially", async () => {
+    const assignments = await assignmentModel.get();
+    expect(assignments).toBeDefined();
+    expect(assignments).toHaveLength(0);
+  });
+
+  it("should retrieve a list of assignments", async () => {
+    const { assignment, assignment2, assignment3 } = await createAssignments();
     const assignments = await assignmentModel.get();
     expect(assignments).toBeDefined();
     expect(assignments).toHaveLength(3);
@@ -74,19 +78,7 @@ describe("assignment model unit tests", () => {
   });
 
   it("should retrieve an assignment by ID", async () => {
-    const student = await studentModel.store({
-      clerkId: "clerk-find-test",
-      timezone: "Africa/Accra",
-    });
-
-    const assignment = await assignmentModel.store({
-      studentId: student.id,
-      title: "Assignment Find Test",
-      description: "Description Find Test",
-      status: "pending",
-      course: "Course Find Test",
-      dueAt: new Date(),
-    });
+    const { assignment } = await createAssignments();
 
     const found = await assignmentModel.findById(assignment!.id);
     expect(found).toBeDefined();
@@ -94,42 +86,18 @@ describe("assignment model unit tests", () => {
   });
 
   it("should store a new assignment", async () => {
-    const student = await studentModel.store({
-      clerkId: "clerk-store-test",
-      timezone: "Africa/Accra",
-    });
-
-    const assignment = await assignmentModel.store({
-      studentId: student.id,
-      title: "Assignment Store Test",
-      description: "Description Store Test",
-      status: "pending",
-      course: "Course Store Test",
-      dueAt: new Date(),
-    });
+    const { student, assignment } = await createAssignments();
 
     expect(assignment).toBeDefined();
     expect(assignment!.studentId).toEqual(student.id);
-    expect(assignment!.title).toEqual("Assignment Store Test");
-    expect(assignment!.description).toEqual("Description Store Test");
+    expect(assignment!.title).toEqual("Assignment 1");
+    expect(assignment!.description).toEqual("Description 1");
     expect(assignment!.status).toEqual("pending");
-    expect(assignment!.course).toEqual("Course Store Test");
+    expect(assignment!.course).toEqual("Course 1");
   });
 
   it("should update an existing assignment", async () => {
-    const student = await studentModel.store({
-      clerkId: "clerk-update-test",
-      timezone: "Africa/Accra",
-    });
-
-    const assignment = await assignmentModel.store({
-      studentId: student.id,
-      title: "Assignment Update Test",
-      description: "Description Update Test",
-      status: "pending",
-      course: "Course Update Test",
-      dueAt: new Date(),
-    });
+    const { assignment } = await createAssignments();
 
     const data: UpdateAssignmentInput = {
       title: "Updated Assignment",
@@ -148,19 +116,7 @@ describe("assignment model unit tests", () => {
   });
 
   it("should delete an existing assignment", async () => {
-    const student = await studentModel.store({
-      clerkId: "clerk-delete-test",
-      timezone: "Africa/Accra",
-    });
-
-    const assignment = await assignmentModel.store({
-      studentId: student.id,
-      title: "Assignment Delete Test",
-      description: "Description Delete Test",
-      status: "pending",
-      course: "Course Delete Test",
-      dueAt: new Date(),
-    });
+    const { assignment } = await createAssignments();
 
     const deleted = await assignmentModel.remove(assignment!.id);
     expect(deleted).toBeDefined();
@@ -168,23 +124,14 @@ describe("assignment model unit tests", () => {
   });
 
   it("should find an assignments by student ID", async () => {
-    const student = await studentModel.store({
-      clerkId: "clerk-find-test",
-      timezone: "Africa/Accra",
-    });
+    const { student } = await createAssignments();
 
-    const assignment = await assignmentModel.store({
-      studentId: student.id,
-      title: "Assignment Find Test",
-      description: "Description Find Test",
-      status: "pending",
-      course: "Course Find Test",
-      dueAt: new Date(),
+    const assignments = await assignmentModel.findByStudentId(student.id);
+    expect(assignments).toBeDefined();
+    expect(assignments.length).toEqual(3);
+    assignments.forEach((assignment) => {
+      expect(assignment.studentId).toEqual(student.id);
     });
-
-    const found = await assignmentModel.findByStudentId(student.id);
-    expect(found).toBeDefined();
-    expect(found!.id).toEqual(assignment!.id);
   });
 
   it("should return null when finding a non-existing assignment by ID", async () => {
@@ -192,9 +139,9 @@ describe("assignment model unit tests", () => {
     expect(found).toBeNull();
   });
 
-  it("should return null when student id a non-existing assignment is queried", async () => {
+  it("should return an empty array when student id a non-existing assignment is queried", async () => {
     const assignments = await assignmentModel.findByStudentId(missingId);
-    expect(assignments).toBeNull();
+    expect(assignments).toEqual([]);
   });
 
   it("should return null when updating a non-existing assignment", async () => {

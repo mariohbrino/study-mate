@@ -41,7 +41,7 @@ export const createAssignmentModel = (db: Database) => {
         .from(tables.assignments)
         .where(eq(tables.assignments.id, id));
 
-      return assignment ? assignment : null;
+      return assignment ?? null;
     },
 
     async update(id: string, data: UpdateAssignmentInput) {
@@ -53,7 +53,7 @@ export const createAssignmentModel = (db: Database) => {
           ...getTableColumns(tables.assignments),
         });
 
-      return assignment ? assignment : null;
+      return assignment ?? null;
     },
 
     async remove(id: string) {
@@ -64,7 +64,7 @@ export const createAssignmentModel = (db: Database) => {
           ...getTableColumns(tables.assignments),
         });
 
-      return assignment ? assignment : null;
+      return assignment ?? null;
     },
   };
 };
