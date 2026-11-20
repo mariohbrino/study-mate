@@ -18,6 +18,20 @@ Table name: students
 | created_at    | TIMESTAMPTZ | NOT NULL              | Record creation             |
 | updated_at    | TIMESTAMPTZ | NOT NULL              | Last update                 |
 
+## Course Entity
+
+The course represents a subject or class that a student is studying within the Study-Mate platform.
+
+Table name: courses
+
+| Column     | Type         | Constraints  | Purpose           |
+| ---------- | ------------ | ------------ | ----------------- |
+| id         | UUID         | PK           | Course identifier |
+| student_id | UUID         | FK, NOT NULL | Course owner      |
+| name       | VARCHAR(120) | NOT NULL     | Course name       |
+| created_at | TIMESTAMPTZ  | NOT NULL     | Record creation   |
+| updated_at | TIMESTAMPTZ  | NOT NULL     | Last update       |
+
 ## Assignments Entity
 
 The assignment represents a task or homework that a student needs to complete within the Study-Mate platform.
