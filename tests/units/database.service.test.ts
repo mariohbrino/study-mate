@@ -1,7 +1,12 @@
 import { eq } from "drizzle-orm";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { assignments, students, studySessions } from "@/database/schema";
+import {
+  assignments,
+  courses,
+  students,
+  studySessions,
+} from "@/database/schema";
 import { database } from "@/services/database.service";
 
 describe("database client unit tests", () => {
@@ -74,5 +79,25 @@ describe("database client unit tests", () => {
       .where(eq(studySessions.studentId, studySession.studentId));
 
     expect(result[0]).toEqual(expect.objectContaining(studySession));
+  });
+
+  it("should insert and retrieve a course correctly", async () => {
+    const [student] = await client
+      .insert(students)
+      .values({ clerkId: "clerk-course-test-id", timezone: "UTC" })
+      .returning({ id: students.id });
+
+    const course = {
+      studentId: student.id,
+      name: "Test course",
+    } satisfies typeof courses.$inferInsert;
+    await client.insert(courses).values(course);
+
+    const result = await client
+      .select()
+      .from(courses)
+      .where(eq(courses.studentId, course.studentId));
+
+    expect(result[0]).toEqual(expect.objectContaining(course));
   });
 });
