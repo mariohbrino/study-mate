@@ -1,11 +1,14 @@
 import { sql } from "drizzle-orm";
 import {
+  foreignKey,
   pgTable,
   timestamp,
   uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+import { students } from "@/database/schemas/students.schema";
 
 export const courses = pgTable(
   "courses",
@@ -19,6 +22,13 @@ export const courses = pgTable(
     updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
   },
   (table) => [
-    uniqueIndex("courses_student_id_name_key").on(table.studentId, table.name),
+    foreignKey({
+      name: "courses_student_id_fkey",
+      columns: [table.studentId],
+      foreignColumns: [students.id],
+    })
+      .onDelete("restrict")
+      .onUpdate("restrict"),
+    uniqueIndex("courses_name_key").on(table.name, table.studentId),
   ],
 );

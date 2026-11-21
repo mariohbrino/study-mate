@@ -63,7 +63,7 @@ describe("course model unit tests", () => {
     expect(result).toEqual(courses);
   });
 
-  it("should create a course", async () => {
+  it("should store a course", async () => {
     const { student } = await createCourses();
     const course = await courseModel.store({
       name: "Test Course",
@@ -121,6 +121,15 @@ describe("course model unit tests", () => {
     const result = await courseModel.findById(missingId);
 
     expect(result).toBeNull();
+  });
+
+  it("should prevent duplicate course names for the same student", async () => {
+    const { student } = await createCourses();
+    const data = { name: "Test Course", studentId: student.id };
+
+    await courseModel.store(data);
+
+    await expect(courseModel.store(data)).rejects.toThrow();
   });
 
   it("a non-existing course should return null when updating", async () => {

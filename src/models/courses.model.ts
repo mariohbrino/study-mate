@@ -18,12 +18,12 @@ export const createCourseModel = (db: Database) => {
     },
 
     async findById(id: string) {
-      const [student] = await db
+      const [course] = await db
         .select()
         .from(courses)
         .where(eq(courses.id, id));
 
-      return student ?? null;
+      return course ?? null;
     },
 
     async findByStudentId(studentId: string) {
