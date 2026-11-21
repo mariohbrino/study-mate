@@ -1,4 +1,4 @@
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 
 import * as tables from "@/database/schema";
 import type {
@@ -9,16 +9,20 @@ import type { Database } from "@/types/database.type";
 
 export const createAssignmentModel = (db: Database) => {
   return {
-    async get() {
-      const assignmentList = await db.select().from(tables.assignments);
-
-      return assignmentList;
+    async get(studentId: string) {
+      return db
+        .select()
+        .from(tables.assignments)
+        .where(eq(tables.assignments.studentId, studentId));
     },
 
-    async store(data: StoreAssignmentInput) {
+    async store(
+      studentId: string,
+      data: Omit<StoreAssignmentInput, "studentId">,
+    ) {
       const [assignment] = await db
         .insert(tables.assignments)
-        .values(data)
+        .values({ ...data, studentId })
         .returning({
           ...getTableColumns(tables.assignments),
         });
@@ -27,28 +31,36 @@ export const createAssignmentModel = (db: Database) => {
     },
 
     async findByStudentId(studentId: string) {
-      const assignment = await db
+      return db
         .select()
         .from(tables.assignments)
         .where(eq(tables.assignments.studentId, studentId));
-
-      return assignment;
     },
 
-    async findById(id: string) {
+    async findById(id: string, studentId: string) {
       const [assignment] = await db
         .select()
         .from(tables.assignments)
-        .where(eq(tables.assignments.id, id));
+        .where(
+          and(
+            eq(tables.assignments.id, id),
+            eq(tables.assignments.studentId, studentId),
+          ),
+        );
 
       return assignment ?? null;
     },
 
-    async update(id: string, data: UpdateAssignmentInput) {
+    async update(id: string, studentId: string, data: UpdateAssignmentInput) {
       const [assignment] = await db
         .update(tables.assignments)
         .set(data)
-        .where(eq(tables.assignments.id, id))
+        .where(
+          and(
+            eq(tables.assignments.id, id),
+            eq(tables.assignments.studentId, studentId),
+          ),
+        )
         .returning({
           ...getTableColumns(tables.assignments),
         });
@@ -56,10 +68,15 @@ export const createAssignmentModel = (db: Database) => {
       return assignment ?? null;
     },
 
-    async remove(id: string) {
+    async remove(id: string, studentId: string) {
       const [assignment] = await db
         .delete(tables.assignments)
-        .where(eq(tables.assignments.id, id))
+        .where(
+          and(
+            eq(tables.assignments.id, id),
+            eq(tables.assignments.studentId, studentId),
+          ),
+        )
         .returning({
           ...getTableColumns(tables.assignments),
         });

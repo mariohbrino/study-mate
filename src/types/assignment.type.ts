@@ -7,8 +7,5 @@ export type Assignment = typeof assignments.$inferSelect;
 export type StoreAssignmentInput = typeof assignments.$inferInsert;
 
 export type UpdateAssignmentInput = Partial<
-  Pick<
-    Assignment,
-    "studentId" | "title" | "description" | "course" | "dueAt" | "status"
-  >
+  Pick<Assignment, "title" | "description" | "course" | "dueAt" | "status">
 >;
