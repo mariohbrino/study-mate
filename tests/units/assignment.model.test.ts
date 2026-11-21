@@ -8,18 +8,22 @@ import type { Database } from "@/types/database.type";
 
 describe("assignment model unit tests", () => {
   const missingId = "00000000-0000-0000-0000-000000000000";
+
   let client: Database;
   let assignmentModel: ReturnType<typeof createAssignmentModel>;
   let studentModel: ReturnType<typeof createStudentModel>;
 
-  const createAssignments = async () => {
-    const student = await studentModel.store({
-      clerkId: "clerk-create-test",
+  const createStudent = async (clerkId: string) => {
+    return studentModel.store({
+      clerkId,
       timezone: "Africa/Accra",
     });
+  };
 
-    const assignment = await assignmentModel.store({
-      studentId: student.id,
+  const createAssignments = async () => {
+    const student = await createStudent("clerk-create-test");
+
+    const assignment = await assignmentModel.store(student.id, {
       title: "Assignment 1",
       description: "Description 1",
       status: "pending",
@@ -27,8 +31,7 @@ describe("assignment model unit tests", () => {
       dueAt: new Date(),
     });
 
-    const assignment2 = await assignmentModel.store({
-      studentId: student.id,
+    const assignment2 = await assignmentModel.store(student.id, {
       title: "Assignment 2",
       description: "Description 2",
       status: "pending",
@@ -36,14 +39,14 @@ describe("assignment model unit tests", () => {
       dueAt: new Date(),
     });
 
-    const assignment3 = await assignmentModel.store({
-      studentId: student.id,
+    const assignment3 = await assignmentModel.store(student.id, {
       title: "Assignment 3",
       description: "Description 3",
       status: "pending",
       course: "Course 1",
       dueAt: new Date(),
     });
+
     return { student, assignment, assignment2, assignment3 };
   };
 
@@ -61,43 +64,63 @@ describe("assignment model unit tests", () => {
     await client.$client.query("ROLLBACK");
   });
 
-  it("should retrieve an empty list of assignments initially", async () => {
-    const assignments = await assignmentModel.get();
-    expect(assignments).toBeDefined();
+  it("should retrieve an empty list of assignments for a student", async () => {
+    const student = await createStudent("clerk-empty-test");
+    const assignments = await assignmentModel.get(student.id);
+
     expect(assignments).toHaveLength(0);
   });
 
-  it("should retrieve a list of assignments", async () => {
-    const { assignment, assignment2, assignment3 } = await createAssignments();
-    const assignments = await assignmentModel.get();
-    expect(assignments).toBeDefined();
+  it("should retrieve only assignments belonging to a student", async () => {
+    const { student, assignment, assignment2, assignment3 } =
+      await createAssignments();
+
+    const otherStudent = await createStudent("clerk-other-test");
+
+    await assignmentModel.store(otherStudent.id, {
+      title: "Other Student Assignment",
+      description: "Another student's work",
+      status: "pending",
+      course: "Course 2",
+      dueAt: new Date(),
+    });
+
+    const assignments = await assignmentModel.get(student.id);
+
     expect(assignments).toHaveLength(3);
     expect(assignments[0]).toEqual(assignment);
     expect(assignments[1]).toEqual(assignment2);
     expect(assignments[2]).toEqual(assignment3);
+    expect(assignments.every((item) => item.studentId === student.id)).toBe(
+      true,
+    );
   });
 
-  it("should retrieve an assignment by ID", async () => {
-    const { assignment } = await createAssignments();
+  it("should retrieve an assignment by ID for its owner", async () => {
+    const { student, assignment } = await createAssignments();
 
-    const found = await assignmentModel.findById(assignment!.id);
-    expect(found).toBeDefined();
+    const found = await assignmentModel.findById(assignment.id, student.id);
+
     expect(found).toEqual(assignment);
   });
 
-  it("should store a new assignment", async () => {
-    const { student, assignment } = await createAssignments();
+  it("should store a new assignment for the specified student", async () => {
+    const student = await createStudent("clerk-store-test");
 
-    expect(assignment).toBeDefined();
-    expect(assignment!.studentId).toEqual(student.id);
-    expect(assignment!.title).toEqual("Assignment 1");
-    expect(assignment!.description).toEqual("Description 1");
-    expect(assignment!.status).toEqual("pending");
-    expect(assignment!.course).toEqual("Course 1");
+    const assignment = await assignmentModel.store(student.id, {
+      title: "New Assignment",
+      description: "New Description",
+      status: "pending",
+      course: "Course 1",
+      dueAt: new Date(),
+    });
+
+    expect(assignment.studentId).toBe(student.id);
+    expect(assignment.title).toBe("New Assignment");
   });
 
-  it("should update an existing assignment", async () => {
-    const { assignment } = await createAssignments();
+  it("should update an assignment belonging to the student", async () => {
+    const { student, assignment } = await createAssignments();
 
     const data: UpdateAssignmentInput = {
       title: "Updated Assignment",
@@ -107,40 +130,97 @@ describe("assignment model unit tests", () => {
       dueAt: new Date(),
     };
 
-    const updated = await assignmentModel.update(assignment!.id, data);
+    const updated = await assignmentModel.update(
+      assignment.id,
+      student.id,
+      data,
+    );
+
     expect(updated).toBeDefined();
-    expect(updated!.title).toEqual("Updated Assignment");
-    expect(updated!.description).toEqual("Updated Description");
-    expect(updated!.status).toEqual("completed");
-    expect(updated!.course).toEqual("Updated Course");
+    expect(updated!.title).toBe("Updated Assignment");
+    expect(updated!.description).toBe("Updated Description");
+    expect(updated!.status).toBe("completed");
+    expect(updated!.course).toBe("Updated Course");
+    expect(updated!.studentId).toBe(student.id);
   });
 
-  it("should delete an existing assignment", async () => {
-    const { assignment } = await createAssignments();
+  it("should delete an assignment belonging to the student", async () => {
+    const { student, assignment } = await createAssignments();
 
-    const deleted = await assignmentModel.remove(assignment!.id);
+    const deleted = await assignmentModel.remove(assignment.id, student.id);
+
     expect(deleted).toBeDefined();
-    expect(deleted!.id).toEqual(assignment!.id);
+    expect(deleted!.id).toBe(assignment.id);
   });
 
-  it("should find an assignments by student ID", async () => {
+  it("should find assignments by student ID", async () => {
     const { student } = await createAssignments();
 
     const assignments = await assignmentModel.findByStudentId(student.id);
-    expect(assignments).toBeDefined();
-    expect(assignments.length).toEqual(3);
+
+    expect(assignments).toHaveLength(3);
     assignments.forEach((assignment) => {
-      expect(assignment.studentId).toEqual(student.id);
+      expect(assignment.studentId).toBe(student.id);
     });
   });
 
-  it("should return null when finding a non-existing assignment by ID", async () => {
-    const found = await assignmentModel.findById(missingId);
+  it("should not allow another student to retrieve an assignment", async () => {
+    const { assignment } = await createAssignments();
+    const otherStudent = await createStudent("clerk-unauthorized-read");
+
+    const found = await assignmentModel.findById(
+      assignment.id,
+      otherStudent.id,
+    );
+
     expect(found).toBeNull();
   });
 
-  it("should return an empty array when student id a non-existing assignment is queried", async () => {
+  it("should not allow another student to update an assignment", async () => {
+    const { student, assignment } = await createAssignments();
+    const otherStudent = await createStudent("clerk-unauthorized-update");
+
+    const updated = await assignmentModel.update(
+      assignment.id,
+      otherStudent.id,
+      { title: "Unauthorized Update" },
+    );
+
+    expect(updated).toBeNull();
+
+    const unchanged = await assignmentModel.findById(assignment.id, student.id);
+
+    expect(unchanged!.title).toBe("Assignment 1");
+  });
+
+  it("should not allow another student to delete an assignment", async () => {
+    const { student, assignment } = await createAssignments();
+    const otherStudent = await createStudent("clerk-unauthorized-delete");
+
+    const deleted = await assignmentModel.remove(
+      assignment.id,
+      otherStudent.id,
+    );
+
+    expect(deleted).toBeNull();
+
+    const stillExists = await assignmentModel.findById(
+      assignment.id,
+      student.id,
+    );
+
+    expect(stillExists).toBeDefined();
+  });
+
+  it("should return null when finding a non-existing assignment", async () => {
+    const found = await assignmentModel.findById(missingId, missingId);
+
+    expect(found).toBeNull();
+  });
+
+  it("should return an empty array for a non-existing student ID", async () => {
     const assignments = await assignmentModel.findByStudentId(missingId);
+
     expect(assignments).toEqual([]);
   });
 
@@ -152,33 +232,35 @@ describe("assignment model unit tests", () => {
       course: "Non-existing Update",
       dueAt: new Date(),
     };
-    const updated = await assignmentModel.update(missingId, data);
+
+    const updated = await assignmentModel.update(missingId, missingId, data);
+
     expect(updated).toBeNull();
   });
 
   it("should return null when deleting a non-existing assignment", async () => {
-    const deleted = await assignmentModel.remove(missingId);
+    const deleted = await assignmentModel.remove(missingId, missingId);
+
     expect(deleted).toBeNull();
   });
 
-  it("should throw when the ID is not a valid UUID for findById", async () => {
-    await expect(assignmentModel.findById("non-valid-id")).rejects.toThrow();
-  });
-
-  it("should throw when the ID is not a valid UUID for update", async () => {
-    const data: UpdateAssignmentInput = {
-      title: "Invalid Update",
-      description: "Invalid Update",
-      status: "completed",
-      course: "Invalid Update",
-      dueAt: new Date(),
-    };
+  it("should throw when the assignment ID is not a valid UUID for findById", async () => {
     await expect(
-      assignmentModel.update("non-valid-id", data),
+      assignmentModel.findById("non-valid-id", missingId),
     ).rejects.toThrow();
   });
 
-  it("should throw when the ID is not a valid UUID for delete", async () => {
-    await expect(assignmentModel.remove("non-valid-id")).rejects.toThrow();
+  it("should throw when the assignment ID is not a valid UUID for update", async () => {
+    await expect(
+      assignmentModel.update("non-valid-id", missingId, {
+        title: "Invalid Update",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("should throw when the assignment ID is not a valid UUID for delete", async () => {
+    await expect(
+      assignmentModel.remove("non-valid-id", missingId),
+    ).rejects.toThrow();
   });
 });
