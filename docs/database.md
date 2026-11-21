@@ -1,6 +1,6 @@
 # Study-Mate Database Schema
 
-This document outlines the database schema for the Study-Mate platform, detailing the structure and relationships of the primary entities: students, assignments, and study sessions.
+This document outlines the database schema for the Study-Mate platform, detailing the structure and relationships of the primary entities: students, courses, assignments, and study sessions.
 
 ![Study-Mate Database Schema](images/database_schema.png "Study-Mate Database Schema")
 
@@ -24,13 +24,13 @@ The course represents a subject or class that a student is studying within the S
 
 Table name: courses
 
-| Column     | Type         | Constraints  | Purpose           |
-| ---------- | ------------ | ------------ | ----------------- |
-| id         | UUID         | PK           | Course identifier |
-| student_id | UUID         | FK, NOT NULL | Course owner      |
-| name       | VARCHAR(120) | NOT NULL     | Course name       |
-| created_at | TIMESTAMPTZ  | NOT NULL     | Record creation   |
-| updated_at | TIMESTAMPTZ  | NOT NULL     | Last update       |
+| Column     | Type         | Constraints                                    | Purpose           |
+| ---------- | ------------ | ---------------------------------------------- | ----------------- |
+| id         | UUID         | PK                                             | Course identifier |
+| student_id | UUID         | FK, NOT NULL, RESTRICT DELETE, RESTRICT UPDATE | Course owner      |
+| name       | VARCHAR(120) | NOT NULL                                       | Course name       |
+| created_at | TIMESTAMPTZ  | NOT NULL                                       | Record creation   |
+| updated_at | TIMESTAMPTZ  | NOT NULL                                       | Last update       |
 
 ## Assignments Entity
 
@@ -38,17 +38,17 @@ The assignment represents a task or homework that a student needs to complete wi
 
 Table name: assignments
 
-| Column      | Type         | Constraints               | Purpose                |
-| ----------- | ------------ | ------------------------- | ---------------------- |
-| id          | UUID         | PK                        | Assignment identifier  |
-| student_id  | UUID         | FK, NOT NULL              | Assignment owner       |
-| title       | VARCHAR(200) | NOT NULL                  | Assignment title       |
-| description | TEXT         | NULL                      | Assignment description |
-| course      | VARCHAR(120) | NULL                      | Course or subject      |
-| due_at      | TIMESTAMPTZ  | NOT NULL                  | Deadline               |
-| status      | TEXT         | NOT NULL, DEFAULT pending | Completion status      |
-| created_at  | TIMESTAMPTZ  | NOT NULL                  | Record creation        |
-| updated_at  | TIMESTAMPTZ  | NOT NULL                  | Last update            |
+| Column      | Type         | Constraints                                    | Purpose                |
+| ----------- | ------------ | ---------------------------------------------- | ---------------------- |
+| id          | UUID         | PK                                             | Assignment identifier  |
+| student_id  | UUID         | FK, NOT NULL, RESTRICT DELETE, RESTRICT UPDATE | Assignment owner       |
+| title       | VARCHAR(200) | NOT NULL                                       | Assignment title       |
+| description | TEXT         | NULL                                           | Assignment description |
+| course      | VARCHAR(120) | NULL                                           | Course or subject      |
+| due_at      | TIMESTAMPTZ  | NOT NULL                                       | Deadline               |
+| status      | TEXT         | NOT NULL, DEFAULT pending                      | Completion status      |
+| created_at  | TIMESTAMPTZ  | NOT NULL                                       | Record creation        |
+| updated_at  | TIMESTAMPTZ  | NOT NULL                                       | Last update            |
 
 ## Study Sessions Entity
 
@@ -56,20 +56,22 @@ The study session represents a planned activity where a student dedicates time t
 
 Table name: study_sessions
 
-| Column           | Type         | Constraints  | Purpose            |
-| ---------------- | ------------ | ------------ | ------------------ |
-| id               | UUID         | PK           | Session identifier |
-| student_id       | UUID         | FK, NOT NULL | Session owner      |
-| assignment_id    | UUID         | FK, NULL     | Related assignment |
-| title            | VARCHAR(200) | NOT NULL     | Session title      |
-| subject          | VARCHAR(120) | NULL         | Course or subject  |
-| scheduled_at     | TIMESTAMPTZ  | NOT NULL     | Scheduled start    |
-| duration_minutes | INTEGER      | NOT NULL     | Planned duration   |
-| created_at       | TIMESTAMPTZ  | NOT NULL     | Record creation    |
-| updated_at       | TIMESTAMPTZ  | NOT NULL     | Last update        |
+| Column           | Type         | Constraints                                    | Purpose            |
+| ---------------- | ------------ | ---------------------------------------------- | ------------------ |
+| id               | UUID         | PK                                             | Session identifier |
+| student_id       | UUID         | FK, NOT NULL, RESTRICT DELETE, RESTRICT UPDATE | Session owner      |
+| assignment_id    | UUID         | FK, NULL, RESTRICT DELETE, RESTRICT UPDATE     | Related assignment |
+| title            | VARCHAR(200) | NOT NULL                                       | Session title      |
+| subject          | VARCHAR(120) | NULL                                           | Course or subject  |
+| scheduled_at     | TIMESTAMPTZ  | NOT NULL                                       | Scheduled start    |
+| duration_minutes | INTEGER      | NOT NULL                                       | Planned duration   |
+| created_at       | TIMESTAMPTZ  | NOT NULL                                       | Record creation    |
+| updated_at       | TIMESTAMPTZ  | NOT NULL                                       | Last update        |
 
 ## Relationships
 
+- A student can have multiple courses.
+- A course belongs to a single student.
 - A student can have multiple assignments.
 - An assignment belongs to a single student.
 - A student can have multiple study sessions.
