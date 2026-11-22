@@ -28,4 +28,9 @@ describe("database migrations integrity tests", () => {
     const exists = await hasTable(client, "study_sessions");
     expect(exists).toBe(true);
   });
+
+  it("should have table courses", async () => {
+    const exists = await hasTable(client, "courses");
+    expect(exists).toBe(true);
+  });
 });

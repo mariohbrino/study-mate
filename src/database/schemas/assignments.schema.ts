@@ -35,7 +35,9 @@ export const assignments = pgTable(
       name: "assignments_student_id_fkey",
       columns: [table.studentId],
       foreignColumns: [students.id],
-    }),
+    })
+      .onDelete("restrict")
+      .onUpdate("restrict"),
     check(
       "assignments_status_check",
       sql`${table.status} IN ('pending', 'in_progress', 'completed')`,
