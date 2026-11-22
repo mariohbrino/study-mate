@@ -1,4 +1,4 @@
-# Tasks: Assignment API CRUD Endpoints
+# Tasks: Assignment API Reads and Server Actions
 
 **Input**: Design documents from `specs/006-assignment-api-crud-endpoints/`
 
@@ -8,41 +8,44 @@
 
 ## Phase 1: Setup
 
-**Purpose**: Confirm project decisions and prepare the feature for implementation.
+**Purpose**: Confirm team decisions and prepare the feature.
 
-- [ ] T001 Obtain team approval for `specs/006-assignment-api-crud-endpoints/spec.md` and update its status after approval.
-- [ ] T002 Confirm the authentication provider with Mario and document the decision in `specs/006-assignment-api-crud-endpoints/research.md`.
-- [ ] T003 Verify the approved authentication dependency and required environment configuration in `package.json` and `.env.example`.
+- [ ] T001 Confirm approval of the revised feature architecture with Mario.
+- [ ] T002 Confirm the team's Clerk application and authentication configuration.
+- [ ] T003 Verify the required Clerk dependency and environment variables in `package.json` and `.env.example`.
+- [ ] T004 Confirm the agreed locations for Server Actions and Zod validation schemas.
 
 ## Phase 2: Foundational
 
-**Purpose**: Establish shared authentication and validation infrastructure required by all user stories.
+**Purpose**: Establish shared authentication and validation infrastructure.
 
-- [ ] T004 Implement a server-side authenticated student resolver using the approved provider in `src/services/assignment-auth.service.ts`; map the authenticated identity to a Student using `findByClerkId()`.
-- [ ] T005 [P] Add authentication resolver tests for authenticated users, unauthenticated users, and missing student records in `tests/units/assignment-auth.service.test.ts`.
-- [ ] T006 Create shared assignment request validation schemas for create and update operations in `src/schemas/assignments.schema.ts`.
-- [ ] T007 [P] Add validation tests for required fields, permitted update fields, invalid status values, and empty update requests in `tests/units/assignments.schema.test.ts`.
+- [ ] T005 Implement a server-side authenticated student resolver in `src/services/assignment-auth.service.ts`, mapping the authenticated Clerk user to a Student using `findByClerkId()`.
+- [ ] T006 [P] Add authentication resolver tests for authenticated users, unauthenticated users, and missing Student records in `tests/units/assignment-auth.service.test.ts`.
+- [ ] T007 Create assignment creation and update Zod schemas in `src/schemas/assignments.schema.ts`.
+- [ ] T008 [P] Add validation tests for required fields, invalid status values, permitted update fields, and empty update requests in `tests/units/assignments.schema.test.ts`.
 
-**Checkpoint**: Authentication resolution and request validation are ready. Do not proceed with provider-specific implementation until the team confirms the provider.
+**Checkpoint**: Authentication resolution and validation are ready before implementing protected operations.
 
 ## Phase 3: User Story 1 - Create and View Assignments (Priority: P1)
 
-**Goal**: Allow authenticated students to create assignments and list only their own assignments.
+**Goal**: Allow authenticated students to create assignments and retrieve their own assignments.
 
-**Independent Test**: An authenticated student can create an assignment and retrieve it from their list without seeing another student's assignments.
+**Independent Test**: An authenticated student can create an assignment through a Server Action and retrieve their assignments through the GET API.
 
-### Tests for User Story 1
+### Tests
 
-- [ ] T008 [P] [US1] Add tests for assignment collection GET and POST, including authentication, validation, and student ownership, in `tests/units/assignment-collection-api.test.ts`.
+- [ ] T009 [P] [US1] Add tests for GET `/api/assignments`, including authentication, Student ownership, and database errors, in `tests/units/assignment-collection-api.test.ts`.
+- [ ] T010 [P] [US1] Add tests for the create assignment Server Action, including validation, authentication, ownership, and successful creation, in `tests/units/assignment.actions.test.ts`.
 
-### Implementation for User Story 1
+### Implementation
 
-- [ ] T009 [US1] Implement collection GET in `src/app/api/assignments/route.ts` using the authenticated student's ID and existing assignment model.
-- [ ] T010 [US1] Implement collection POST in `src/app/api/assignments/route.ts` using the create validation schema and `assignmentModel.store()`.
-- [ ] T011 [US1] Return the documented JSON response structure without exposing `studentId` in `src/app/api/assignments/route.ts`.
-- [ ] T012 [US1] Implement appropriate 200, 201, 400, 401, 404, and 500 responses for collection operations in `src/app/api/assignments/route.ts`.
+- [ ] T011 [US1] Implement GET `/api/assignments` in `src/app/api/assignments/route.ts` using the authenticated Student ID and existing Assignment model.
+- [ ] T012 [US1] Implement the create assignment Server Action in `src/actions/assignment.actions.ts` using the creation schema and `assignmentModel.store()`.
+- [ ] T013 [US1] Ensure collection API responses do not expose unnecessary internal ownership information.
+- [ ] T014 [US1] Return appropriate HTTP status codes and error responses from the collection GET handler.
+- [ ] T015 [US1] Ensure the create action validates its input, verifies authentication, and uses the authenticated Student ID rather than trusting client-supplied ownership data.
 
-**Checkpoint**: User Story 1 must pass its tests independently.
+**Checkpoint**: Students can list and create their own assignments, and the related tests pass.
 
 ## Phase 4: User Story 2 - View and Update an Individual Assignment (Priority: P2)
 
@@ -50,97 +53,102 @@
 
 **Independent Test**: A student can retrieve and update their own assignment, while another student's assignment remains inaccessible.
 
-### Tests for User Story 2
+### Tests
 
-- [ ] T013 [P] [US2] Add tests for individual assignment GET and PATCH, including invalid UUIDs, ownership protection, invalid updates, and missing assignments, in `tests/units/assignment-item-api.test.ts`.
+- [ ] T016 [P] [US2] Add tests for GET `/api/assignments/[id]`, including invalid UUIDs, missing records, authentication, ownership, and database errors, in `tests/units/assignment-item-api.test.ts`.
+- [ ] T017 [US2] Add tests for the update assignment Server Action, including validation, authentication, ownership, missing records, and successful updates, in `tests/units/assignment.actions.test.ts`.
 
-### Implementation for User Story 2
+### Implementation
 
-- [ ] T014 [US2] Implement individual assignment GET in `src/app/api/assignments/[id]/route.ts` using `assignmentModel.findById()` with the authenticated student's ID.
-- [ ] T015 [US2] Implement individual assignment PATCH in `src/app/api/assignments/[id]/route.ts` using the update validation schema and `assignmentModel.update()`.
-- [ ] T016 [US2] Validate assignment UUIDs and prevent changes to `id` or `studentId` in `src/app/api/assignments/[id]/route.ts`.
-- [ ] T017 [US2] Return the documented response structure and appropriate 200, 400, 401, 404, and 500 responses for individual GET and PATCH operations in `src/app/api/assignments/[id]/route.ts`.
+- [ ] T018 [US2] Implement individual assignment GET in `src/app/api/assignments/[id]/route.ts` using `assignmentModel.findById()` and the authenticated Student ID.
+- [ ] T019 [US2] Implement the update assignment Server Action in `src/actions/assignment.actions.ts` using the update schema and `assignmentModel.update()`.
+- [ ] T020 [US2] Validate assignment UUIDs and prevent changes to protected fields such as `id` and `studentId`.
+- [ ] T021 [US2] Return appropriate HTTP status codes and error responses from the individual GET handler.
+- [ ] T022 [US2] Ensure the update action verifies ownership and revalidates affected data after a successful update.
 
-**Checkpoint**: User Stories 1 and 2 must both pass their tests.
+**Checkpoint**: Individual assignment retrieval and updates pass their tests.
 
 ## Phase 5: User Story 3 - Delete an Assignment (Priority: P3)
 
 **Goal**: Allow authenticated students to delete assignments they own.
 
-**Independent Test**: A student can delete their own assignment, and another student cannot delete it.
+**Independent Test**: A student can delete their own assignment, but cannot delete another student's assignment.
 
-### Tests for User Story 3
+### Tests
 
-- [ ] T018 [P] [US3] Add tests for assignment deletion, including successful deletion, unauthenticated requests, missing assignments, and cross-student deletion attempts, in `tests/units/assignment-delete-api.test.ts`.
+- [ ] T023 [US3] Add tests for the delete assignment Server Action, including successful deletion, authentication, missing records, and cross-student access attempts, in `tests/units/assignment.actions.test.ts`.
 
-### Implementation for User Story 3
+### Implementation
 
-- [ ] T019 [US3] Implement individual assignment DELETE in `src/app/api/assignments/[id]/route.ts` using `assignmentModel.remove()` with the authenticated student's ID.
-- [ ] T020 [US3] Return 204 No Content after successful deletion and appropriate 400, 401, 404, and 500 responses for deletion failures in `src/app/api/assignments/[id]/route.ts`.
+- [ ] T024 [US3] Implement the delete assignment Server Action in `src/actions/assignment.actions.ts` using `assignmentModel.remove()`.
+- [ ] T025 [US3] Ensure the delete action verifies authentication and ownership and revalidates affected data after successful deletion.
 
-**Checkpoint**: All three user stories must pass their tests.
+**Checkpoint**: All assignment operations pass their tests.
 
-## Phase 6: Polish and Cross-Cutting Concerns
+## Phase 6: User Experience, Documentation, and Quality
 
-**Purpose**: Verify security, quality, and documentation across all API operations.
+**Purpose**: Complete user feedback, documentation, security review, and quality checks.
 
-- [ ] T021 [P] Review authentication and ownership checks across `src/app/api/assignments/route.ts` and `src/app/api/assignments/[id]/route.ts`.
-- [ ] T022 [P] Verify API response documentation matches the implementation in `specs/006-assignment-api-crud-endpoints/contracts/assignments-api.md`.
-- [ ] T023 Run the complete automated test suite and resolve failures using `npm run test`.
-- [ ] T024 Run TypeScript checks and resolve errors using `npm run typecheck`.
-- [ ] T025 Run lint checks and resolve errors using `npm run lint`.
-- [ ] T026 Run formatting checks and resolve issues using `npm run format`.
-- [ ] T027 Verify the implementation steps and test scenarios documented in `specs/006-assignment-api-crud-endpoints/quickstart.md`.
+- [ ] T026 Add form validation messages and useful error feedback for assignment mutations.
+- [ ] T027 Add pending/loading states and success feedback for assignment mutations.
+- [ ] T028 [P] Document Clerk authentication, Student mapping, API read endpoints, and Server Action mutations.
+- [ ] T029 [P] Review authentication and ownership checks across all API handlers and Server Actions.
+- [ ] T030 Verify the API contract in `specs/006-assignment-api-crud-endpoints/contracts/assignments-api.md` matches the GET-only API implementation.
+- [ ] T031 Run the complete automated test suite using `npm run test`.
+- [ ] T032 Run TypeScript checks using `npm run typecheck`.
+- [ ] T033 Run lint checks using `npm run lint`.
+- [ ] T034 Run formatting checks using `npm run format`.
+- [ ] T035 Verify implementation and test instructions in `specs/006-assignment-api-crud-endpoints/quickstart.md`.
 
 ## Dependencies and Execution Order
 
 ### Phase Dependencies
 
-- Phase 1 must be completed before implementation, including feature approval and authentication-provider confirmation.
-- Phase 2 establishes the shared authentication and validation foundation.
-- Phase 3 delivers the P1 MVP.
-- Phase 4 delivers individual assignment retrieval and updates.
-- Phase 5 completes assignment CRUD functionality.
-- Phase 6 verifies quality and security before the pull request.
+- Phase 1 confirms team decisions and project configuration.
+- Phase 2 establishes shared authentication and validation.
+- Phase 3 delivers assignment creation and collection retrieval.
+- Phase 4 adds individual retrieval and updates.
+- Phase 5 adds deletion.
+- Phase 6 completes user feedback, documentation, and quality checks.
 
 ### User Story Dependencies
 
-- **US1 (P1)**: Depends on Phase 2.
-- **US2 (P2)**: Depends on Phase 2 and uses the same authentication and validation foundation.
-- **US3 (P3)**: Depends on Phase 2 and uses the individual assignment route created for US2.
+- **US1 (P1)** depends on Phase 2.
+- **US2 (P2)** depends on Phase 2 and reuses the authentication and validation foundation.
+- **US3 (P3)** depends on Phase 2 and the existing Assignment model.
 
-Because US2 and US3 modify the same route file, implement them sequentially to avoid file conflicts.
+### Parallel Opportunities
 
-## Parallel Opportunities
-
-- T005 and T007 can be worked on in parallel because they use separate test files.
-- T008 can be prepared independently after the shared foundation is available.
-- T013 and T018 use separate test files and can be prepared independently.
-- T021 and T022 can be reviewed independently.
-- Avoid parallel implementation tasks that modify the same route file.
+- T006 and T008 can be developed independently.
+- T009 and T010 can be developed independently.
+- T016 and T017 should not be developed in parallel because they share a test file.
+- T028 and T029 can be reviewed independently.
+- Avoid parallel implementation changes to the same file.
 
 ## Implementation Strategy
 
 ### MVP First
 
-1. Complete Phase 1 and obtain the required approvals.
-2. Complete Phase 2.
-3. Implement and test US1.
-4. Validate that authenticated students can create and list their own assignments.
+1. Confirm team approval and Clerk configuration.
+2. Complete authentication and validation foundations.
+3. Implement and test GET `/api/assignments`.
+4. Implement and test the create assignment Server Action.
 
 ### Incremental Delivery
 
-1. Add US2 for retrieving and updating individual assignments.
-2. Add US3 for deleting assignments.
-3. Run all tests and quality checks.
-4. Submit the feature through a reviewed pull request.
+1. Add individual assignment retrieval.
+2. Add the update Server Action.
+3. Add the delete Server Action.
+4. Complete user feedback and documentation.
+5. Run all tests and quality checks.
+6. Submit a reviewed pull request.
 
 ## Notes
 
-- All tasks use sequential IDs.
-- `[P]` identifies tasks that can be performed in parallel.
-- `[US1]`, `[US2]`, and `[US3]` identify the user story associated with each task.
-- All assignment operations must use the authenticated student's database ID.
+- All assignment operations must use the authenticated Student's database ID.
 - Never trust client-supplied ownership information.
+- Reuse the existing Assignment model and its ownership-aware methods.
+- API Route Handlers are used for reads; Server Actions are used for mutations.
 - Do not expose internal database errors or stack traces.
-- Keep the authentication provider decision documented and approved by the team.
+- Keep Clerk configuration and team decisions documented.
+- Task IDs are sequential and `[P]` identifies tasks that can be developed independently.

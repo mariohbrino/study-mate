@@ -1,4 +1,4 @@
-# Quickstart: Assignment API CRUD Endpoints
+# Quickstart: Assignment API Reads and Server Actions
 
 ## 1. Prerequisites
 
@@ -9,7 +9,7 @@ Before running the feature, ensure you have:
 - The Study-Mate repository cloned locally.
 - Project dependencies installed.
 - PostgreSQL environment variables configured.
-- The authentication provider and required credentials configured after team confirmation.
+- The team's Clerk application and required authentication configuration available.
 
 ## 2. Install Dependencies
 
@@ -18,6 +18,8 @@ From the project root, run:
 ```bash
 npm install
 ```
+
+Verify the Clerk dependency and project authentication setup before implementing or testing authenticated operations.
 
 ## 3. Configure Environment Variables
 
@@ -32,9 +34,9 @@ Configure the required PostgreSQL settings:
 - `POSTGRES_PASSWORD`
 - `POSTGRES_SSLMODE`
 
-Add authentication environment variables only after the team confirms the authentication provider and its setup instructions.
+Configure Clerk environment variables using the team's approved setup instructions.
 
-Never commit `.env` files or share secret keys in source code.
+Never commit `.env` files or share secret keys in source code or public messages.
 
 ## 4. Start the Development Server
 
@@ -46,21 +48,41 @@ npm run dev
 
 Open the local URL displayed in the terminal.
 
-## 5. Assignment API Endpoints
+## 5. Assignment GET API Endpoints
 
-After implementation, the following endpoints should be available:
+After implementation, the following read endpoints should be available:
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/assignments` | List the authenticated student's assignments |
-| POST | `/api/assignments` | Create an assignment |
-| GET | `/api/assignments/{id}` | Retrieve one assignment |
-| PATCH | `/api/assignments/{id}` | Update an assignment |
-| DELETE | `/api/assignments/{id}` | Delete an assignment |
+| GET | `/api/assignments/[id]` | Retrieve one assignment belonging to the authenticated student |
 
-Every request must use a valid authenticated session.
+Both endpoints require a valid authenticated session.
 
-## 6. Run Automated Tests
+The server must resolve the Clerk user to an existing Student record before retrieving assignment data.
+
+## 6. Assignment Server Actions
+
+Creating, updating, and deleting assignments must use Server Actions rather than POST, PATCH, or DELETE API endpoints.
+
+| Operation | Server Action responsibility |
+|---|---|
+| Create | Validate input and create an assignment using `store()` |
+| Update | Validate input and update an owned assignment using `update()` |
+| Delete | Delete an owned assignment using `remove()` |
+
+The actions must:
+
+- Authenticate the current user.
+- Resolve the user's Student database record.
+- Use the Student database ID for ownership checks.
+- Validate inputs using Zod.
+- Return appropriate success or error results.
+- Revalidate affected assignment data after successful mutations.
+
+The client must never supply the authoritative Student ID.
+
+## 7. Run Automated Tests
 
 Run the project test suite:
 
@@ -86,28 +108,32 @@ Check formatting:
 npm run format
 ```
 
-## 7. Important Test Scenarios
+## 8. Important Test Scenarios
 
 Verify that:
 
-1. An authenticated student can create an assignment.
-2. A student can retrieve their own assignments.
-3. A student can update their own assignment.
-4. A student can delete their own assignment.
-5. An unauthenticated request receives `401 Unauthorized`.
-6. Invalid request data receives `400 Bad Request`.
-7. A student cannot access another student's assignment.
-8. A missing student record does not allow assignment operations.
-9. An invalid assignment UUID is rejected.
-10. Unexpected server errors do not expose internal details.
+1. An authenticated student can retrieve their assignments.
+2. A student can retrieve one of their own assignments.
+3. An authenticated student can create an assignment through a Server Action.
+4. A student can update their own assignment through a Server Action.
+5. A student can delete their own assignment through a Server Action.
+6. An unauthenticated user cannot access assignment data or perform mutations.
+7. Invalid input receives appropriate validation feedback.
+8. A student cannot access or modify another student's assignment.
+9. A missing Student record does not allow assignment operations.
+10. An invalid assignment UUID is rejected by the individual GET endpoint.
+11. Unexpected server errors do not expose internal details.
+12. Successful mutations refresh or revalidate affected assignment data.
 
-## 8. Security Verification
+## 9. Security Verification
 
-For every request, the server must:
+For every assignment operation, the server must:
 
-1. Verify the authenticated user.
-2. Find the matching Student record.
+1. Verify the authenticated Clerk user.
+2. Find the matching Student record using `findByClerkId()`.
 3. Use that Student record's database ID for assignment operations.
-4. Check assignment ownership when an individual assignment is requested or modified.
+4. Check assignment ownership for individual assignment retrieval, updates, and deletion.
+5. Reject invalid input before database operations.
+6. Avoid exposing private assignment data or internal error details.
 
-The API must never rely on a student ID supplied by the client.
+The application must never rely on a Student ID supplied by the client.
