@@ -34,11 +34,15 @@ export const studySessions = pgTable(
       name: "study_sessions_student_id_fkey",
       columns: [table.studentId],
       foreignColumns: [students.id],
-    }),
+    })
+      .onDelete("restrict")
+      .onUpdate("restrict"),
     foreignKey({
       name: "study_sessions_assignment_id_fkey",
       columns: [table.assignmentId],
       foreignColumns: [assignments.id],
-    }),
+    })
+      .onDelete("restrict")
+      .onUpdate("restrict"),
   ],
 );

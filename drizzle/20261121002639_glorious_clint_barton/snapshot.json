@@ -2,7 +2,7 @@
   "type": "base",
   "version": "9",
   "dialect": "postgres",
-  "id": "9b3f30ad-ca11-48f4-be78-7dde602f6299",
+  "id": "b831a3d7-e233-41e6-9957-ac9bf63442fd",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -21,6 +21,25 @@
         "n|rel|public.assignments",
         "n|type|public.assignments",
         "n|rel|public.assignments_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "courses"
+      ],
+      "writes": [
+        "s|tbl|public.courses",
+        "n|tbl|public.courses",
+        "e|tbl|public.courses",
+        "n|rel|public.courses",
+        "n|type|public.courses",
+        "n|rel|public.courses_pkey"
       ],
       "reads": [
         "n|sch|public"
@@ -83,6 +102,27 @@
         "n|sch|public",
         "n|col|public.assignments.title",
         "n|col|public.assignments.student_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "courses",
+        "courses_name_key"
+      ],
+      "writes": [
+        "s|idx|public.courses_name_key",
+        "n|idx|public.courses_name_key",
+        "e|idx|public.courses_name_key",
+        "n|rel|public.courses_name_key"
+      ],
+      "reads": [
+        "n|tbl|public.courses",
+        "n|sch|public",
+        "n|col|public.courses.name",
+        "n|col|public.courses.student_id"
       ]
     },
     {
@@ -154,6 +194,29 @@
       "statementTarget": [
         "table",
         "public",
+        "courses"
+      ],
+      "writes": [
+        "s|fk|public.courses.courses_student_id_fkey",
+        "n|fk|public.courses.courses_student_id_fkey",
+        "e|fk|public.courses.courses_student_id_fkey",
+        "n|con|public.courses.courses_student_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.courses",
+        "n|sch|public",
+        "n|tbl|public.students",
+        "n|sch|public",
+        "n|col|public.courses.student_id",
+        "n|col|public.students.id",
+        "e|uniqueness|public.students.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
         "study_sessions"
       ],
       "writes": [
@@ -200,6 +263,12 @@
     {
       "schema": "public",
       "name": "assignments",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "courses",
       "isRlsEnabled": false,
       "entityType": "tables"
     },
@@ -322,6 +391,71 @@
     {
       "schema": "public",
       "table": "assignments",
+      "name": "updated_at",
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "courses",
+      "name": "id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "uuidv7()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "courses",
+      "name": "student_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "courses",
+      "name": "name",
+      "type": "varchar(120)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "courses",
+      "name": "created_at",
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "courses",
       "name": "updated_at",
       "type": "timestamp",
       "typeSchema": null,
@@ -544,6 +678,34 @@
     },
     {
       "schema": "public",
+      "table": "courses",
+      "name": "courses_name_key",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "name",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "student_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
       "table": "students",
       "name": "students_clerk_id_key",
       "nameExplicit": true,
@@ -604,8 +766,25 @@
       "columnsTo": [
         "id"
       ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "NO ACTION",
+      "onUpdate": "RESTRICT",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "courses",
+      "name": "courses_student_id_fkey",
+      "nameExplicit": true,
+      "columns": [
+        "student_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "students",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "RESTRICT",
+      "onDelete": "RESTRICT",
       "entityType": "fks"
     },
     {
@@ -621,8 +800,8 @@
       "columnsTo": [
         "id"
       ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "NO ACTION",
+      "onUpdate": "RESTRICT",
+      "onDelete": "RESTRICT",
       "entityType": "fks"
     },
     {
@@ -638,14 +817,24 @@
       "columnsTo": [
         "id"
       ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "NO ACTION",
+      "onUpdate": "RESTRICT",
+      "onDelete": "RESTRICT",
       "entityType": "fks"
     },
     {
       "schema": "public",
       "table": "assignments",
       "name": "assignments_pkey",
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "courses",
+      "name": "courses_pkey",
       "columns": [
         "id"
       ],
