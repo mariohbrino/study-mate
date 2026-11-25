@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 const navigationLinks = [
   { label: "Home", href: "/" },
@@ -55,26 +56,30 @@ export default function Navigation() {
           ))}
         </nav>
 
-        <button
-          type="button"
-          className="rounded-lg p-2 text-zinc-700 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 md:hidden dark:text-zinc-200 dark:hover:bg-zinc-800"
-          aria-label={
-            menuOpen ? "Close navigation menu" : "Open navigation menu"
-          }
-          aria-expanded={menuOpen}
-          aria-controls="mobile-navigation"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? (
-            <span className="text-xl" aria-hidden="true">
-              ✕
-            </span>
-          ) : (
-            <span className="text-xl" aria-hidden="true">
-              ☰
-            </span>
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+
+          <button
+            type="button"
+            className="rounded-lg p-2 text-zinc-700 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 md:hidden dark:text-zinc-200 dark:hover:bg-zinc-800"
+            aria-label={
+              menuOpen ? "Close navigation menu" : "Open navigation menu"
+            }
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? (
+              <span className="text-xl" aria-hidden="true">
+                ✕
+              </span>
+            ) : (
+              <span className="text-xl" aria-hidden="true">
+                ☰
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {menuOpen && (
