@@ -30,19 +30,16 @@ describe("course model unit tests", () => {
       timezone: "UTC",
     });
 
-    const course1 = await courseModel.store({
+    const course1 = await courseModel.store(student.id, {
       name: "Test Course 1",
-      studentId: student.id,
     });
 
-    const course2 = await courseModel.store({
+    const course2 = await courseModel.store(student.id, {
       name: "Test Course 2",
-      studentId: student.id,
     });
 
-    const course3 = await courseModel.store({
+    const course3 = await courseModel.store(student.id, {
       name: "Test Course 3",
-      studentId: student.id,
     });
 
     const courses = [course1, course2, course3];
@@ -65,9 +62,8 @@ describe("course model unit tests", () => {
 
   it("should store a course", async () => {
     const { student } = await createCourses();
-    const course = await courseModel.store({
+    const course = await courseModel.store(student.id, {
       name: "Test Course",
-      studentId: student.id,
     });
     expect(course.id).toBeDefined();
   });
@@ -127,9 +123,11 @@ describe("course model unit tests", () => {
     const { student } = await createCourses();
     const data = { name: "Test Course", studentId: student.id };
 
-    await courseModel.store(data);
+    await courseModel.store(student.id, { name: data.name });
 
-    await expect(courseModel.store(data)).rejects.toThrow();
+    await expect(
+      courseModel.store(student.id, { name: data.name }),
+    ).rejects.toThrow();
   });
 
   it("a non-existing course should return null when updating", async () => {

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { courses } from "@/database/schema";
-import type { StoreCourseInput, UpdateCourseInput } from "@/types/course.type";
+import type { Course } from "@/types/course.type";
 import type { Database } from "@/types/database.type";
 
 export const createCourseModel = (db: Database) => {
@@ -11,8 +11,14 @@ export const createCourseModel = (db: Database) => {
       return courseList;
     },
 
-    async store(data: StoreCourseInput) {
-      const [course] = await db.insert(courses).values(data).returning();
+    async store(
+      studentId: string,
+      data: Omit<Course, "id" | "studentId" | "createdAt" | "updatedAt">,
+    ) {
+      const [course] = await db
+        .insert(courses)
+        .values({ ...data, studentId })
+        .returning();
 
       return course;
     },
@@ -35,7 +41,7 @@ export const createCourseModel = (db: Database) => {
       return course;
     },
 
-    async update(id: string, data: UpdateCourseInput) {
+    async update(id: string, data: Pick<Course, "name">) {
       const [course] = await db
         .update(courses)
         .set({
