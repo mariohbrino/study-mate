@@ -4,6 +4,7 @@ import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 const navigationLinks = [
   { label: "Assignments", href: "/assignments", authRequired: true },
@@ -72,6 +73,8 @@ export default function Navigation() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
+
           <Suspense>
             <Show when="signed-out">
               <SignInButton>
@@ -89,6 +92,7 @@ export default function Navigation() {
               <UserButton />
             </Show>
           </Suspense>
+
           <button
             type="button"
             className="rounded-lg p-2 text-zinc-700 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 md:hidden dark:text-zinc-200 dark:hover:bg-zinc-800"

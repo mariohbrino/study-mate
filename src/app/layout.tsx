@@ -1,8 +1,9 @@
+import Navigation from "@/components/Navigation";
+import ThemeProvider from "@/providers/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
-import Navigation from "@/components/Navigation";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,12 +25,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
         <ClerkProvider>
-          <Navigation />
-          {children}
+          <ThemeProvider>
+            <Navigation />
+            {children}
+          </ThemeProvider>
         </ClerkProvider>
       </body>
     </html>
