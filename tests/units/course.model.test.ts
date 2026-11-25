@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { createCourseModel } from "@/models/courses.model";
+import { createCourseModel } from "@/models/course.model";
 import { createStudentModel } from "@/models/student.model";
 import { database } from "@/services/database.service";
 
