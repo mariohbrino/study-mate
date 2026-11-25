@@ -13,7 +13,8 @@ export async function GET(): Promise<Response> {
     const students = await studentModels.get();
 
     return Response.json({ data: students });
-  } catch {
+  } catch (error) {
+    console.error("Unable to retrieve student records.", error);
     return Response.json(
       { error: "Unable to retrieve student records." },
       { status: 500 },

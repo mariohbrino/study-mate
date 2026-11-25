@@ -33,7 +33,8 @@ export async function GET(
     }
 
     return Response.json({ data: student });
-  } catch {
+  } catch (error) {
+    console.error("Unable to retrieve the student record.", error);
     return Response.json(
       { error: "Unable to retrieve the student record." },
       { status: 500 },
