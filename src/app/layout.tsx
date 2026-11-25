@@ -1,7 +1,7 @@
+import Navigation from "@/components/Navigation";
+import ThemeProvider from "@/providers/ThemeProvider";
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import Navigation from "../components/Navigation";
-import ThemeProvider from "../components/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({
