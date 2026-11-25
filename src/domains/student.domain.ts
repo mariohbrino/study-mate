@@ -35,7 +35,10 @@ export const findOrCreateStudent = async (
 };
 
 export const getAuthenticatedStudent = async (defaultTimezone?: string) => {
-  const { userId } = await auth.protect();
+  const { userId } = await auth();
+  if (!userId) {
+    return null;
+  }
 
   return findOrCreateStudent(userId, defaultTimezone);
 };
