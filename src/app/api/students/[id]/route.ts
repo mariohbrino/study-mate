@@ -1,4 +1,3 @@
-import { getAuthenticatedStudent } from "@/domains/student.domain";
 import { createStudentModel } from "@/models/student.model";
 import { studentSearchParamsSchema } from "@/schemas/student.schema";
 import { database } from "@/services/database.service";
@@ -19,11 +18,6 @@ export async function GET(
   }
 
   try {
-    const authenticatedStudent = await getAuthenticatedStudent();
-    if (!authenticatedStudent) {
-      return Response.json({ error: "Unauthorized." }, { status: 401 });
-    }
-
     const student = await createStudentModel(database()).findById(
       validation.data.id,
     );

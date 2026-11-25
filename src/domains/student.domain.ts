@@ -34,11 +34,22 @@ export const findOrCreateStudent = async (
   return existing;
 };
 
-export const getAuthenticatedStudent = async (defaultTimezone?: string) => {
-  const { userId } = await auth();
-  if (!userId) {
-    return null;
+export const getAuthStudent = async (defaultTimezone?: string) => {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return null;
+    }
+    return findOrCreateStudent(userId, defaultTimezone);
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "digest" in error &&
+      (error as { digest: unknown }).digest === "HANGING_PROMISE_REJECTION"
+    ) {
+      return null; // safe during prerender / build
+    }
+    throw error;
   }
-
-  return findOrCreateStudent(userId, defaultTimezone);
 };

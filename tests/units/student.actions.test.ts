@@ -75,7 +75,7 @@ describe("student server actions", () => {
     const formData = new FormData();
     formData.set("timezone", "America/Sao_Paulo");
 
-    const result = await updateStudent({ id: created.data.id }, formData);
+    const result = await updateStudent(created.data.id, formData);
 
     expect(result.success).toBe(true);
     if (result.success) {
@@ -87,7 +87,7 @@ describe("student server actions", () => {
     const formData = new FormData();
     formData.set("timezone", "UTC");
 
-    const result = await updateStudent({ id: "invalid-id" }, formData);
+    const result = await updateStudent("invalid-id", formData);
 
     expect(result).toEqual({
       success: false,
@@ -106,7 +106,7 @@ describe("student server actions", () => {
     const formData = new FormData();
     formData.set("timezone", "");
 
-    const result = await updateStudent({ id: created.data.id }, formData);
+    const result = await updateStudent(created.data.id, formData);
 
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -119,7 +119,7 @@ describe("student server actions", () => {
     formData.set("timezone", "UTC");
 
     const result = await updateStudent(
-      { id: "00000000-0000-4000-8000-000000000000" },
+      "00000000-0000-4000-8000-000000000000",
       formData,
     );
 
@@ -137,7 +137,7 @@ describe("student server actions", () => {
     expect(created.success).toBe(true);
     if (!created.success) return;
 
-    const result = await removeStudent({ id: created.data.id });
+    const result = await removeStudent(created.data.id);
 
     expect(result.success).toBe(true);
     if (result.success) {
@@ -146,7 +146,7 @@ describe("student server actions", () => {
   });
 
   it("rejects an invalid ID when removing a student", async () => {
-    const result = await removeStudent({ id: "invalid-id" });
+    const result = await removeStudent("invalid-id");
 
     expect(result).toEqual({
       success: false,
@@ -155,9 +155,7 @@ describe("student server actions", () => {
   });
 
   it("returns a not found error when removing a missing student", async () => {
-    const result = await removeStudent({
-      id: "00000000-0000-4000-8000-000000000000",
-    });
+    const result = await removeStudent("00000000-0000-4000-8000-000000000000");
 
     expect(result).toEqual({
       success: false,

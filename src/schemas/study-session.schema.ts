@@ -7,7 +7,6 @@ const optionalAssignmentId = z.preprocess(
 
 export const studySessionSearchParamsSchema = z.object({
   id: z.uuid(),
-  studentId: z.uuid(),
 });
 
 export const studySessionListParamsSchema = z.object({
@@ -15,7 +14,6 @@ export const studySessionListParamsSchema = z.object({
 });
 
 export const studySessionFormSchema = z.object({
-  studentId: z.uuid(),
   assignmentId: optionalAssignmentId,
   title: z.string().trim().min(1, "Title is required.").max(200),
   subject: z
@@ -36,7 +34,6 @@ export const studySessionFormSchema = z.object({
 });
 
 export const studySessionUpdateFormSchema = studySessionFormSchema
-  .omit({ studentId: true })
   .partial()
   .refine((value) => Object.keys(value).length > 0, {
     message: "At least one field must be provided.",
