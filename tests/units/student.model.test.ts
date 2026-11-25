@@ -99,6 +99,21 @@ describe("student model unit tests", () => {
     expect(result).toBeNull();
   });
 
+  it("should not duplicate a student when the clerk id already exists", async () => {
+    const created = await studentModel.store({
+      clerkId: "clerk-if-missing-test",
+      timezone: "UTC",
+    });
+
+    const result = await studentModel.storeIfMissing({
+      clerkId: "clerk-if-missing-test",
+      timezone: "Africa/Accra",
+    });
+
+    expect(result).toBeNull();
+    expect((await studentModel.findById(created.id))?.timezone).toBe("UTC");
+  });
+
   it("should update a student's timezone", async () => {
     const created = await studentModel.store({
       clerkId: "clerk-update-test",

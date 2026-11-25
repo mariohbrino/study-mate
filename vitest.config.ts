@@ -34,7 +34,10 @@ export default defineConfig({
           name: "node",
           environment: "node",
           include: ["tests/**/*.test.ts"],
-          setupFiles: ["./tests/setup/database.setup.ts"],
+          setupFiles: [
+            "./tests/setup/database.setup.ts",
+            "./tests/setup/auth.setup.ts",
+          ],
         },
       },
     ],

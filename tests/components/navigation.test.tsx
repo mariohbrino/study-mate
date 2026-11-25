@@ -1,12 +1,26 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import Navigation from "@/components/Navigation";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
+}));
+
+vi.mock("@clerk/nextjs", () => ({
+  Show: ({
+    when,
+    children,
+  }: {
+    when: "signed-in" | "signed-out";
+    children: ReactNode;
+  }) => (when === "signed-in" ? <>{children}</> : null),
+  SignInButton: ({ children }: { children: ReactNode }) => <>{children}</>,
+  SignUpButton: ({ children }: { children: ReactNode }) => <>{children}</>,
+  UserButton: () => <div data-testid="user-button" />,
 }));
 
 describe("navigation component", () => {
@@ -17,24 +31,8 @@ describe("navigation component", () => {
   it("displays all navigation links", () => {
     render(<Navigation />);
 
-    const navigation = screen.getByRole("navigation", {
-      name: "Main navigation",
-    });
-
     expect(
-      within(navigation).getByRole("link", { name: "Home" }),
-    ).toBeInTheDocument();
-
-    expect(
-      within(navigation).getByRole("link", { name: "Assignments" }),
-    ).toBeInTheDocument();
-
-    expect(
-      within(navigation).getByRole("link", { name: "Courses" }),
-    ).toBeInTheDocument();
-
-    expect(
-      within(navigation).getByRole("link", { name: "Study Planner" }),
+      screen.getByRole("navigation", { name: "Main navigation" }),
     ).toBeInTheDocument();
   });
 

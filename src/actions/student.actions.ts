@@ -20,18 +20,19 @@ const formDataToObject = (
 export async function storeStudent(
   formData: FormData,
 ): Promise<StudentActionResult> {
-  const validation = studentFormSchema.safeParse(formDataToObject(formData));
+  const validated = studentFormSchema.safeParse(formDataToObject(formData));
 
-  if (!validation.success) {
+  if (!validated.success) {
     return {
       success: false,
       error: "Please correct the student information.",
-      issues: validation.error.issues.map((issue) => issue.message),
+      issues: validated.error.issues.map((issue) => issue.message),
     };
   }
 
   try {
-    const student = await createStudentModel(database()).store(validation.data);
+    const studentModel = createStudentModel(database());
+    const student = await studentModel.store(validated.data);
     return { success: true, data: student };
   } catch {
     return {
@@ -42,32 +43,29 @@ export async function storeStudent(
 }
 
 export async function updateStudent(
-  searchParams: { id: string },
+  studentId: string,
   formData: FormData,
 ): Promise<StudentActionResult> {
-  const paramsValidation = studentSearchParamsSchema.safeParse(searchParams);
-
-  if (!paramsValidation.success) {
+  const params = studentSearchParamsSchema.safeParse({ id: studentId });
+  if (!params.success) {
     return { success: false, error: "Invalid student ID." };
   }
 
-  const formValidation = studentUpdateFormSchema.safeParse(
+  const validated = studentUpdateFormSchema.safeParse(
     formDataToObject(formData),
   );
 
-  if (!formValidation.success) {
+  if (!validated.success) {
     return {
       success: false,
       error: "Please correct the student information.",
-      issues: formValidation.error.issues.map((issue) => issue.message),
+      issues: validated.error.issues.map((issue) => issue.message),
     };
   }
 
   try {
-    const student = await createStudentModel(database()).update(
-      paramsValidation.data.id,
-      formValidation.data,
-    );
+    const studentModel = createStudentModel(database());
+    const student = await studentModel.update(params.data.id, validated.data);
 
     if (!student) {
       return { success: false, error: "Student not found." };
@@ -82,19 +80,17 @@ export async function updateStudent(
   }
 }
 
-export async function removeStudent(searchParams: {
-  id: string;
-}): Promise<StudentActionResult> {
-  const validation = studentSearchParamsSchema.safeParse(searchParams);
-
-  if (!validation.success) {
+export async function removeStudent(
+  studentId: string,
+): Promise<StudentActionResult> {
+  const params = studentSearchParamsSchema.safeParse({ id: studentId });
+  if (!params.success) {
     return { success: false, error: "Invalid student ID." };
   }
 
   try {
-    const student = await createStudentModel(database()).remove(
-      validation.data.id,
-    );
+    const studentModel = createStudentModel(database());
+    const student = await studentModel.remove(params.data.id);
 
     if (!student) {
       return { success: false, error: "Student not found." };
