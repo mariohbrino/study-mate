@@ -21,6 +21,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.10.9",
     "drizzle-orm": "^1.0.0-rc.5",
     "next": "16.4.5",
     "pg": "^8.23.1",
