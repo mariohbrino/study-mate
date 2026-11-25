@@ -1,0 +1,70 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "8cd65cbd-c640-45f8-bc2a-2c65e0dd2b6b",
+  "prevIds": [
+    "9b3f30ad-ca11-48f4-be78-7dde602f6299"
+  ],
+  "footprints": [
+    {
+      "statementType": "alter_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "study_sessions",
+        "duration_minutes"
+      ],
+      "writes": [
+        "s|colprop|public.study_sessions.duration_minutes.type",
+        "s|colprop|public.study_sessions.duration_minutes.default"
+      ],
+      "reads": [
+        "n|tbl|public.study_sessions",
+        "n|sch|public",
+        "n|col|public.study_sessions.duration_minutes"
+      ],
+      "sqlHash": "9bcbf6e607be4d91"
+    },
+    {
+      "statementType": "recreate_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "study_sessions"
+      ],
+      "writes": [
+        "s|fk|public.study_sessions.study_sessions_assignment_id_fkey",
+        "n|fk|public.study_sessions.study_sessions_assignment_id_fkey",
+        "e|fk|public.study_sessions.study_sessions_assignment_id_fkey",
+        "n|con|public.study_sessions.study_sessions_assignment_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.study_sessions",
+        "n|sch|public",
+        "n|tbl|public.assignments",
+        "n|sch|public",
+        "n|col|public.study_sessions.assignment_id",
+        "n|col|public.assignments.id",
+        "e|uniqueness|public.assignments.id"
+      ],
+      "sqlHash": "9d19618497255522"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "alter",
+      "key": "columns\u0000[\"public\",\"study_sessions\",\"duration_minutes\"]",
+      "set": {
+        "type": "integer"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "fks\u0000[\"public\",\"study_sessions\",\"study_sessions_assignment_id_fkey\"]",
+      "set": {
+        "onDelete": "SET NULL"
+      }
+    }
+  ]
+}

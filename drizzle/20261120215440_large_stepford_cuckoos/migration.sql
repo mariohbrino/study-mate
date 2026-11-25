@@ -1,0 +1,2 @@
+ALTER TABLE "study_sessions" ALTER COLUMN "duration_minutes" SET DATA TYPE integer USING "duration_minutes"::integer;--> statement-breakpoint
+ALTER TABLE "study_sessions" DROP CONSTRAINT "study_sessions_assignment_id_fkey", ADD CONSTRAINT "study_sessions_assignment_id_fkey" FOREIGN KEY ("assignment_id") REFERENCES "assignments"("id") ON DELETE SET NULL;

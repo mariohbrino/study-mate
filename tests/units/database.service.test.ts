@@ -64,7 +64,7 @@ describe("database client unit tests", () => {
     const studySession = {
       studentId: student.id,
       title: "Test study session",
-      durationMinutes: "60",
+      durationMinutes: 60,
     } satisfies typeof studySessions.$inferInsert;
     await client.insert(studySessions).values(studySession);
 

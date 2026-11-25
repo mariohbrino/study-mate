@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   foreignKey,
+  integer,
   pgTable,
   timestamp,
   uniqueIndex,
@@ -24,7 +25,7 @@ export const studySessions = pgTable(
     scheduledAt: timestamp("scheduled_at", { mode: "date" })
       .notNull()
       .defaultNow(),
-    durationMinutes: varchar("duration_minutes", { length: 255 }).notNull(),
+    durationMinutes: integer("duration_minutes").notNull(),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
   },
@@ -39,6 +40,6 @@ export const studySessions = pgTable(
       name: "study_sessions_assignment_id_fkey",
       columns: [table.assignmentId],
       foreignColumns: [assignments.id],
-    }),
+    }).onDelete("set null"),
   ],
 );
