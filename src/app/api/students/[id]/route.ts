@@ -1,3 +1,4 @@
+import { getAuthStudent } from "@/domains/student.domain";
 import { createStudentModel } from "@/models/student.model";
 import { studentSearchParamsSchema } from "@/schemas/student.schema";
 import { database } from "@/services/database.service";
@@ -10,14 +11,19 @@ export async function GET(
   _request: Request,
   context: StudentRouteContext,
 ): Promise<Response> {
-  const { id } = await context.params;
-  const validation = studentSearchParamsSchema.safeParse({ id });
-
-  if (!validation.success) {
-    return Response.json({ error: "Invalid student ID." }, { status: 400 });
-  }
-
   try {
+    const authenticatedStudent = await getAuthStudent();
+    if (!authenticatedStudent) {
+      return Response.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const { id } = await context.params;
+    const validation = studentSearchParamsSchema.safeParse({ id });
+
+    if (!validation.success) {
+      return Response.json({ error: "Invalid student ID." }, { status: 400 });
+    }
+
     const student = await createStudentModel(database()).findById(
       validation.data.id,
     );

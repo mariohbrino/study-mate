@@ -1,8 +1,14 @@
+import { getAuthStudent } from "@/domains/student.domain";
 import { createStudentModel } from "@/models/student.model";
 import { database } from "@/services/database.service";
 
 export async function GET(): Promise<Response> {
   try {
+    const authenticatedStudent = await getAuthStudent();
+    if (!authenticatedStudent) {
+      return Response.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
     const studentModels = createStudentModel(database());
     const students = await studentModels.get();
 
