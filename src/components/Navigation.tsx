@@ -1,15 +1,15 @@
 "use client";
 
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 
 const navigationLinks = [
-  { label: "Home", href: "/" },
-  { label: "Assignments", href: "/assignments" },
-  { label: "Courses", href: "/courses" },
-  { label: "Study Planner", href: "/study-planner" },
+  { label: "Assignments", href: "/assignments", authRequired: true },
+  { label: "Courses", href: "/courses", authRequired: true },
+  { label: "Study Planner", href: "/study-planner", authRequired: true },
 ];
 
 export default function Navigation() {
@@ -44,20 +44,54 @@ export default function Navigation() {
           aria-label="Main navigation"
           className="hidden items-center gap-2 md:flex"
         >
-          {navigationLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={getLinkClass(link.href)}
-              aria-current={pathname === link.href ? "page" : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
+          <Show when="signed-in">
+            {navigationLinks
+              .filter((link) => link.authRequired)
+              .map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={getLinkClass(link.href)}
+                  aria-current={pathname === link.href ? "page" : undefined}
+                >
+                  {link.label}
+                </Link>
+              ))}
+          </Show>
+          {navigationLinks
+            .filter((link) => !link.authRequired)
+            .map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={getLinkClass(link.href)}
+                aria-current={pathname === link.href ? "page" : undefined}
+              >
+                {link.label}
+              </Link>
+            ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <ThemeToggle />
+
+          <Suspense>
+            <Show when="signed-out">
+              <SignInButton>
+                <button className="text-foreground hover:bg-accent hover:text-accent-foreground border-border h-9 cursor-pointer rounded-full border px-4 text-sm font-medium transition-colors">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton>
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 cursor-pointer rounded-full px-4 text-sm font-medium transition-colors">
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+          </Suspense>
 
           <button
             type="button"
@@ -70,11 +104,11 @@ export default function Navigation() {
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? (
-              <span className="text-xl" aria-hidden="true">
+              <span className="px-2 text-xl" aria-hidden="true">
                 ✕
               </span>
             ) : (
-              <span className="text-xl" aria-hidden="true">
+              <span className="px-2 text-xl" aria-hidden="true">
                 ☰
               </span>
             )}
@@ -88,17 +122,34 @@ export default function Navigation() {
           aria-label="Mobile navigation"
           className="flex flex-col gap-2 border-t border-zinc-200 px-6 py-4 md:hidden dark:border-zinc-800"
         >
-          {navigationLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={getLinkClass(link.href)}
-              aria-current={pathname === link.href ? "page" : undefined}
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+          <Show when="signed-in">
+            {navigationLinks
+              .filter((link) => link.authRequired)
+              .map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={getLinkClass(link.href)}
+                  aria-current={pathname === link.href ? "page" : undefined}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+          </Show>
+          {navigationLinks
+            .filter((link) => !link.authRequired)
+            .map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={getLinkClass(link.href)}
+                aria-current={pathname === link.href ? "page" : undefined}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
         </nav>
       )}
     </header>

@@ -1,5 +1,7 @@
 "use server";
 
+import { getAuthStudent } from "@/domains/student.domain";
+import { createAssignmentModel } from "@/models/assignment.model";
 import { createStudySessionModel } from "@/models/study-session.model";
 import {
   studySessionFormSchema,
@@ -17,25 +19,53 @@ const formDataToObject = (
   formData: FormData,
 ): Record<string, FormDataEntryValue> => Object.fromEntries(formData.entries());
 
+const assignmentBelongsToStudent = async (
+  assignmentId: string | null | undefined,
+  studentId: string,
+): Promise<boolean> => {
+  if (!assignmentId) return true;
+
+  const assignment = await createAssignmentModel(database()).findById(
+    assignmentId,
+    studentId,
+  );
+  return assignment !== null;
+};
+
 export async function storeStudySession(
   formData: FormData,
 ): Promise<StudySessionActionResult> {
-  const validation = studySessionFormSchema.safeParse(
+  const authStudent = await getAuthStudent();
+  if (!authStudent) {
+    return { success: false, error: "Unauthorized." };
+  }
+
+  const validated = studySessionFormSchema.safeParse(
     formDataToObject(formData),
   );
-  if (!validation.success) {
+
+  if (!validated.success) {
     return {
       success: false,
       error: "Please correct the study session information.",
-      issues: validation.error.issues.map((issue) => issue.message),
+      issues: validated.error.issues.map((issue) => issue.message),
     };
   }
 
-  const { studentId, ...data } = validation.data;
   try {
-    const studySession = await createStudySessionModel(database()).store(
-      studentId,
-      data,
+    if (
+      !(await assignmentBelongsToStudent(
+        validated.data.assignmentId,
+        authStudent.id,
+      ))
+    ) {
+      return { success: false, error: "Assignment not found." };
+    }
+
+    const studySessionModel = createStudySessionModel(database());
+    const studySession = await studySessionModel.store(
+      authStudent.id,
+      validated.data,
     );
     return { success: true, data: studySession };
   } catch {
@@ -44,13 +74,19 @@ export async function storeStudySession(
 }
 
 export async function updateStudySession(
-  searchParams: { id: string; studentId: string },
+  studySessionId: string,
   formData: FormData,
 ): Promise<StudySessionActionResult> {
-  const paramsValidation =
-    studySessionSearchParamsSchema.safeParse(searchParams);
-  if (!paramsValidation.success) {
-    return { success: false, error: "Invalid study session or student ID." };
+  const authStudent = await getAuthStudent();
+  if (!authStudent) {
+    return { success: false, error: "Unauthorized." };
+  }
+
+  const params = studySessionSearchParamsSchema.safeParse({
+    id: studySessionId,
+  });
+  if (!params.success) {
+    return { success: false, error: "Invalid study session ID." };
   }
 
   const formValidation = studySessionUpdateFormSchema.safeParse(
@@ -65,9 +101,19 @@ export async function updateStudySession(
   }
 
   try {
-    const studySession = await createStudySessionModel(database()).update(
-      paramsValidation.data.id,
-      paramsValidation.data.studentId,
+    if (
+      !(await assignmentBelongsToStudent(
+        formValidation.data.assignmentId,
+        authStudent.id,
+      ))
+    ) {
+      return { success: false, error: "Assignment not found." };
+    }
+
+    const studySessionModel = createStudySessionModel(database());
+    const studySession = await studySessionModel.update(
+      params.data.id,
+      authStudent.id,
       formValidation.data,
     );
     if (!studySession)
@@ -78,19 +124,26 @@ export async function updateStudySession(
   }
 }
 
-export async function removeStudySession(searchParams: {
-  id: string;
-  studentId: string;
-}): Promise<StudySessionActionResult> {
-  const validation = studySessionSearchParamsSchema.safeParse(searchParams);
-  if (!validation.success) {
-    return { success: false, error: "Invalid study session or student ID." };
+export async function removeStudySession(
+  studySessionId: string,
+): Promise<StudySessionActionResult> {
+  const authStudent = await getAuthStudent();
+  if (!authStudent) {
+    return { success: false, error: "Unauthorized." };
+  }
+
+  const params = studySessionSearchParamsSchema.safeParse({
+    id: studySessionId,
+  });
+  if (!params.success) {
+    return { success: false, error: "Invalid study session ID." };
   }
 
   try {
-    const studySession = await createStudySessionModel(database()).remove(
-      validation.data.id,
-      validation.data.studentId,
+    const studySessionModel = createStudySessionModel(database());
+    const studySession = await studySessionModel.remove(
+      params.data.id,
+      authStudent.id,
     );
     if (!studySession)
       return { success: false, error: "Study session not found." };

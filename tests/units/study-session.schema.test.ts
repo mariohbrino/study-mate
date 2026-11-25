@@ -8,7 +8,6 @@ import {
 } from "@/schemas/study-session.schema";
 
 const validSession = {
-  studentId: "00000000-0000-4000-8000-000000000001",
   title: "Review database concepts",
   subject: "Computer Science",
   scheduledAt: "2026-12-01T10:00:00.000Z",
@@ -23,15 +22,6 @@ describe("study session schemas", () => {
   it("rejects an empty title", () => {
     expect(
       studySessionFormSchema.safeParse({ ...validSession, title: " " }).success,
-    ).toBe(false);
-  });
-
-  it("rejects an invalid student ID", () => {
-    expect(
-      studySessionFormSchema.safeParse({
-        ...validSession,
-        studentId: "not-a-uuid",
-      }).success,
     ).toBe(false);
   });
 
@@ -75,13 +65,12 @@ describe("study session schemas", () => {
   it("accepts valid list and item search parameters", () => {
     expect(
       studySessionListParamsSchema.safeParse({
-        studentId: validSession.studentId,
+        studentId: "00000000-0000-4000-8000-000000000001",
       }).success,
     ).toBe(true);
     expect(
       studySessionSearchParamsSchema.safeParse({
         id: "00000000-0000-4000-8000-000000000003",
-        studentId: validSession.studentId,
       }).success,
     ).toBe(true);
   });
