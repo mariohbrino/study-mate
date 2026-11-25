@@ -20,6 +20,16 @@ export const createStudentModel = (db: Database) => {
       return student;
     },
 
+    async storeIfMissing(data: StoreStudentInput) {
+      const [student] = await db
+        .insert(students)
+        .values(data)
+        .onConflictDoNothing({ target: students.clerkId })
+        .returning();
+
+      return student ?? null;
+    },
+
     async findById(id: string) {
       const [student] = await db
         .select()
